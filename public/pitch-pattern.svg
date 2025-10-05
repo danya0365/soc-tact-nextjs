@@ -1,0 +1,96 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Define the pitch pattern -->
+    <pattern id="grassStripes" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="50" height="100" fill="rgba(255,255,255,0.03)"/>
+      <rect x="50" y="0" width="50" height="100" fill="rgba(255,255,255,0.05)"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background with grass stripes -->
+  <rect width="800" height="600" fill="url(#grassStripes)"/>
+  
+  <!-- Outer boundary lines -->
+  <rect x="50" y="50" width="700" height="500" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Center line -->
+  <line x1="400" y1="50" x2="400" y2="550" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Center circle -->
+  <circle cx="400" cy="300" r="80" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  <circle cx="400" cy="300" r="4" fill="rgba(255,255,255,0.3)"/>
+  
+  <!-- Left penalty area -->
+  <rect x="50" y="150" width="120" height="200" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Left goal area -->
+  <rect x="50" y="225" width="50" height="50" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Left penalty arc -->
+  <path d="M 170 220 A 80 80 0 0 0 170 380" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Left penalty spot -->
+  <circle cx="140" cy="300" r="3" fill="rgba(255,255,255,0.3)"/>
+  
+  <!-- Right penalty area -->
+  <rect x="630" y="150" width="120" height="200" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Right goal area -->
+  <rect x="700" y="225" width="50" height="50" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Right penalty arc -->
+  <path d="M 630 220 A 80 80 0 0 1 630 380" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+  
+  <!-- Right penalty spot -->
+  <circle cx="660" cy="300" r="3" fill="rgba(255,255,255,0.3)"/>
+  
+  <!-- Corner arcs -->
+  <!-- Top-left corner -->
+  <path d="M 50 65 A 15 15 0 0 1 65 50" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Top-right corner -->
+  <path d="M 735 50 A 15 15 0 0 1 750 65" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Bottom-left corner -->
+  <path d="M 65 550 A 15 15 0 0 1 50 535" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Bottom-right corner -->
+  <path d="M 750 535 A 15 15 0 0 1 735 550" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Left goal -->
+  <rect x="35" y="250" width="15" height="100" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <line x1="35" y1="250" x2="50" y2="250" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <line x1="35" y1="350" x2="50" y2="350" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  
+  <!-- Right goal -->
+  <rect x="750" y="250" width="15" height="100" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <line x1="750" y1="250" x2="765" y2="250" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <line x1="750" y1="350" x2="765" y2="350" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  
+  <!-- Decorative tactical elements -->
+  <!-- Tactical arrows (subtle) -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="rgba(255,255,255,0.15)"/>
+    </marker>
+  </defs>
+  
+  <!-- Subtle tactical movement lines -->
+  <line x1="200" y1="200" x2="280" y2="150" stroke="rgba(255,255,255,0.1)" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+  <line x1="200" y1="400" x2="280" y2="450" stroke="rgba(255,255,255,0.1)" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+  <line x1="600" y1="200" x2="520" y2="150" stroke="rgba(255,255,255,0.1)" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+  <line x1="600" y1="400" x2="520" y2="450" stroke="rgba(255,255,255,0.1)" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+  
+  <!-- Player position dots (very subtle) -->
+  <circle cx="140" cy="200" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="140" cy="400" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="250" cy="300" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="300" cy="200" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="300" cy="400" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  
+  <circle cx="660" cy="200" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="660" cy="400" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="550" cy="300" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="500" cy="200" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <circle cx="500" cy="400" r="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+</svg>
