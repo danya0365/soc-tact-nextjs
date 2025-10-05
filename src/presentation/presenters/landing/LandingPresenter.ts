@@ -1,9 +1,18 @@
 /**
  * Landing Page Presenter
  * Handles business logic for the Soccer Tactics landing page
+ * Integrates with Football API for real data
  */
 
-// Mock data interfaces
+import {
+  getLiveMatches,
+  getStandingsByLeague,
+  LEAGUE_IDS,
+  type Match,
+  type Standing,
+} from "@/src/infrastructure/api";
+
+// View Model interfaces for Landing Page
 export interface LiveMatch {
   id: string;
   homeTeam: string;
@@ -63,198 +72,182 @@ export interface LandingViewModel {
 
 /**
  * Landing Presenter
- * Provides mock data for the landing page
+ * Integrates with Football API for real data
  */
 export class LandingPresenter {
   /**
-   * Get view model with mock data
+   * Map API Match to LiveMatch view model
+   */
+  private mapToLiveMatch(match: Match): LiveMatch {
+    return {
+      id: match.id.toString(),
+      homeTeam: match.homeTeam.name,
+      awayTeam: match.awayTeam.name,
+      homeScore: match.score.home ?? 0,
+      awayScore: match.score.away ?? 0,
+      minute: match.minute ?? 0,
+      status: match.status === "live" || match.status === "in_play" ? "live" : "upcoming",
+      league: match.league.name,
+      homeLogo: match.homeTeam.logo || "⚽",
+      awayLogo: match.awayTeam.logo || "⚽",
+    };
+  }
+
+  /**
+   * Map API Standing to LeagueStanding view model
+   */
+  private mapToLeagueStanding(standing: Standing): LeagueStanding {
+    return {
+      position: standing.position,
+      team: standing.team.name,
+      logo: standing.team.logo || "⚽",
+      played: standing.played,
+      won: standing.won,
+      drawn: standing.drawn,
+      lost: standing.lost,
+      goalsFor: standing.goalsFor,
+      goalsAgainst: standing.goalsAgainst,
+      goalDifference: standing.goalDifference,
+      points: standing.points,
+      form: standing.form || [],
+    };
+  }
+
+  /**
+   * Get fallback data when API fails
+   */
+  private getFallbackData(): LandingViewModel {
+    return {
+      liveMatches: [],
+      leagueStandings: [],
+      featuredPosts: [
+        {
+          id: "1",
+          title: "วิเคราะห์แทคติค 4-3-3 ของ Man City",
+          author: "Tactical Genius",
+          authorAvatar: "👨‍💼",
+          excerpt: "การใช้ False 9 และ Inverted Wingers...",
+          thumbnail: "⚽",
+          formation: "4-3-3",
+          league: "Premier League",
+          upvotes: 245,
+          comments: 38,
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      stats: {
+        totalPosts: 1247,
+        totalUsers: 8934,
+        totalMatches: 0,
+        totalLeagues: 12,
+      },
+      popularLeagues: [
+        "Premier League",
+        "La Liga",
+        "Serie A",
+        "Bundesliga",
+        "Ligue 1",
+      ],
+    };
+  }
+
+  /**
+   * Get view model with real API data
    */
   async getViewModel(): Promise<LandingViewModel> {
-    // Mock live matches
-    const liveMatches: LiveMatch[] = [
-      {
-        id: "1",
-        homeTeam: "Manchester United",
-        awayTeam: "Liverpool",
-        homeScore: 2,
-        awayScore: 1,
-        minute: 67,
-        status: "live",
-        league: "Premier League",
-        homeLogo: "🔴",
-        awayLogo: "🔴",
-      },
-      {
-        id: "2",
-        homeTeam: "Real Madrid",
-        awayTeam: "Barcelona",
-        homeScore: 1,
-        awayScore: 1,
-        minute: 82,
-        status: "live",
-        league: "La Liga",
-        homeLogo: "⚪",
-        awayLogo: "🔵",
-      },
-      {
-        id: "3",
-        homeTeam: "Bayern Munich",
-        awayTeam: "Borussia Dortmund",
-        homeScore: 3,
-        awayScore: 2,
-        minute: 90,
-        status: "live",
-        league: "Bundesliga",
-        homeLogo: "🔴",
-        awayLogo: "🟡",
-      },
-    ];
+    try {
+      // Fetch real data from Football API
+      const [liveMatchesData, standingsData] = await Promise.all([
+        getLiveMatches().catch(() => [] as Match[]),
+        getStandingsByLeague(LEAGUE_IDS.PREMIER_LEAGUE).catch(() => [] as Standing[]),
+      ]);
 
-    // Mock league standings (Premier League)
-    const leagueStandings: LeagueStanding[] = [
-      {
-        position: 1,
-        team: "Manchester City",
-        logo: "🔵",
-        played: 28,
-        won: 21,
-        drawn: 4,
-        lost: 3,
-        goalsFor: 68,
-        goalsAgainst: 25,
-        goalDifference: 43,
-        points: 67,
-        form: ["W", "W", "D", "W", "W"],
-      },
-      {
-        position: 2,
-        team: "Arsenal",
-        logo: "🔴",
-        played: 28,
-        won: 20,
-        drawn: 5,
-        lost: 3,
-        goalsFor: 65,
-        goalsAgainst: 28,
-        goalDifference: 37,
-        points: 65,
-        form: ["W", "W", "W", "D", "W"],
-      },
-      {
-        position: 3,
-        team: "Liverpool",
-        logo: "🔴",
-        played: 28,
-        won: 19,
-        drawn: 6,
-        lost: 3,
-        goalsFor: 62,
-        goalsAgainst: 30,
-        goalDifference: 32,
-        points: 63,
-        form: ["W", "D", "W", "W", "L"],
-      },
-      {
-        position: 4,
-        team: "Aston Villa",
-        logo: "🟣",
-        played: 28,
-        won: 17,
-        drawn: 5,
-        lost: 6,
-        goalsFor: 55,
-        goalsAgainst: 38,
-        goalDifference: 17,
-        points: 56,
-        form: ["W", "W", "L", "W", "D"],
-      },
-      {
-        position: 5,
-        team: "Tottenham",
-        logo: "⚪",
-        played: 28,
-        won: 16,
-        drawn: 4,
-        lost: 8,
-        goalsFor: 58,
-        goalsAgainst: 42,
-        goalDifference: 16,
-        points: 52,
-        form: ["L", "W", "W", "D", "W"],
-      },
-    ];
+      // Map to view models
+      const liveMatches = liveMatchesData
+        .slice(0, 3)
+        .map((match) => this.mapToLiveMatch(match));
 
-    // Mock featured tactical posts
-    const featuredPosts: TacticalPost[] = [
-      {
-        id: "1",
-        title: "วิเคราะห์แทคติค 4-3-3 ของ Man City ที่ทำให้พวกเขาครองบอลได้มากกว่า 70%",
-        author: "Tactical Genius",
-        authorAvatar: "👨‍💼",
-        excerpt:
-          "การใช้ False 9 และ Inverted Wingers ทำให้ Man City สามารถสร้างพื้นที่ในกลางสนามได้อย่างมีประสิทธิภาพ...",
-        thumbnail: "⚽",
-        formation: "4-3-3",
-        league: "Premier League",
-        upvotes: 245,
-        comments: 38,
-        createdAt: "2024-03-15T10:30:00Z",
-      },
-      {
-        id: "2",
-        title: "ทำไม Arsenal ถึงใช้ Build-up แบบ 3-2-5 และมันได้ผลยังไง?",
-        author: "Football Analyst",
-        authorAvatar: "🎯",
-        excerpt:
-          "Arteta ปรับเปลี่ยนวิธีการเล่นจากหลังด้วยการให้ Fullback เข้ามาเป็น Inverted ทำให้มีตัวเลือกในการส่งบอลมากขึ้น...",
-        thumbnail: "🎨",
-        formation: "4-3-3 → 3-2-5",
-        league: "Premier League",
-        upvotes: 189,
-        comments: 27,
-        createdAt: "2024-03-14T15:20:00Z",
-      },
-      {
-        id: "3",
-        title: "การกดตัวสูงของ Liverpool: High Press ที่มีประสิทธิภาพที่สุดในยุโรป",
-        author: "Press Master",
-        authorAvatar: "⚡",
-        excerpt:
-          "Klopp ใช้ระบบ Gegenpressing ที่ทำให้ Liverpool สามารถกดเอาบอลคืนภายใน 5 วินาทีหลังเสียบอล...",
-        thumbnail: "🔥",
-        formation: "4-3-3",
-        league: "Premier League",
-        upvotes: 312,
-        comments: 45,
-        createdAt: "2024-03-13T09:15:00Z",
-      },
-    ];
+      const leagueStandings = standingsData
+        .slice(0, 5)
+        .map((standing) => this.mapToLeagueStanding(standing));
 
-    // Mock stats
-    const stats: LandingStats = {
-      totalPosts: 1247,
-      totalUsers: 8934,
-      totalMatches: 156,
-      totalLeagues: 12,
-    };
+      // Mock featured tactical posts (will be replaced with real data later)
+      const featuredPosts: TacticalPost[] = [
+        {
+          id: "1",
+          title: "วิเคราะห์แทคติค 4-3-3 ของ Man City ที่ทำให้พวกเขาครองบอลได้มากกว่า 70%",
+          author: "Tactical Genius",
+          authorAvatar: "👨‍💼",
+          excerpt:
+            "การใช้ False 9 และ Inverted Wingers ทำให้ Man City สามารถสร้างพื้นที่ในกลางสนามได้อย่างมีประสิทธิภาพ...",
+          thumbnail: "⚽",
+          formation: "4-3-3",
+          league: "Premier League",
+          upvotes: 245,
+          comments: 38,
+          createdAt: "2024-03-15T10:30:00Z",
+        },
+        {
+          id: "2",
+          title: "ทำไม Arsenal ถึงใช้ Build-up แบบ 3-2-5 และมันได้ผลยังไง?",
+          author: "Football Analyst",
+          authorAvatar: "🎯",
+          excerpt:
+            "Arteta ปรับเปลี่ยนวิธีการเล่นจากหลังด้วยการให้ Fullback เข้ามาเป็น Inverted ทำให้มีตัวเลือกในการส่งบอลมากขึ้น...",
+          thumbnail: "🎨",
+          formation: "4-3-3 → 3-2-5",
+          league: "Premier League",
+          upvotes: 189,
+          comments: 27,
+          createdAt: "2024-03-14T15:20:00Z",
+        },
+        {
+          id: "3",
+          title: "การกดตัวสูงของ Liverpool: High Press ที่มีประสิทธิภาพที่สุดในยุโรป",
+          author: "Press Master",
+          authorAvatar: "⚡",
+          excerpt:
+            "Klopp ใช้ระบบ Gegenpressing ที่ทำให้ Liverpool สามารถกดเอาบอลคืนภายใน 5 วินาทีหลังเสียบอล...",
+          thumbnail: "🔥",
+          formation: "4-3-3",
+          league: "Premier League",
+          upvotes: 312,
+          comments: 45,
+          createdAt: "2024-03-13T09:15:00Z",
+        },
+      ];
 
-    // Mock popular leagues
-    const popularLeagues = [
-      "Premier League",
-      "La Liga",
-      "Serie A",
-      "Bundesliga",
-      "Ligue 1",
-      "Thai Premier League",
-    ];
+      // Stats (using real data where available)
+      const stats: LandingStats = {
+        totalPosts: 1247,
+        totalUsers: 8934,
+        totalMatches: liveMatchesData.length || 156,
+        totalLeagues: 12,
+      };
 
-    return {
-      liveMatches,
-      leagueStandings,
-      featuredPosts,
-      stats,
-      popularLeagues,
-    };
+      // Popular leagues
+      const popularLeagues = [
+        "Premier League",
+        "La Liga",
+        "Serie A",
+        "Bundesliga",
+        "Ligue 1",
+        "Thai Premier League",
+      ];
+
+      return {
+        liveMatches,
+        leagueStandings,
+        featuredPosts,
+        stats,
+        popularLeagues,
+      };
+    } catch (error) {
+      console.error("Error fetching landing data:", error);
+      
+      // Return fallback data if API fails
+      return this.getFallbackData();
+    }
   }
 
   /**

@@ -2,6 +2,7 @@
 
 import { LandingViewModel } from "@/src/presentation/presenters/landing/LandingPresenter";
 import { useLandingPresenter } from "@/src/presentation/presenters/landing/useLandingPresenter";
+import Image from "next/image";
 
 interface LandingViewProps {
   initialViewModel?: LandingViewModel;
@@ -205,7 +206,17 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1">
-                      <span className="text-3xl">{match.homeLogo}</span>
+                      {match.homeLogo.startsWith('http') ? (
+                        <Image 
+                          src={match.homeLogo} 
+                          alt={match.homeTeam}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <span className="text-3xl">{match.homeLogo}</span>
+                      )}
                       <span className="font-semibold text-gray-900 dark:text-gray-100">
                         {match.homeTeam}
                       </span>
@@ -217,7 +228,17 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
-                      <span className="text-3xl">{match.awayLogo}</span>
+                      {match.awayLogo.startsWith('http') ? (
+                        <Image 
+                          src={match.awayLogo} 
+                          alt={match.awayTeam}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <span className="text-3xl">{match.awayLogo}</span>
+                      )}
                       <span className="font-semibold text-gray-900 dark:text-gray-100">
                         {match.awayTeam}
                       </span>
@@ -296,7 +317,17 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          <span className="text-2xl">{team.logo}</span>
+                          {team.logo.startsWith('http') ? (
+                            <Image 
+                              src={team.logo} 
+                              alt={team.team}
+                              width={24}
+                              height={24}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <span className="text-2xl">{team.logo}</span>
+                          )}
                           <span className="font-semibold text-gray-900 dark:text-gray-100">
                             {team.team}
                           </span>
