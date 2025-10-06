@@ -70,15 +70,11 @@ export interface LandingViewModel {
   popularLeagues: string[];
 }
 
-/**
- * Landing Presenter
- * Integrates with Football API for real data
- */
-export class LandingPresenter {
+export class LandingPresenterMapper {
   /**
    * Map API Match to LiveMatch view model
    */
-  private mapToLiveMatch(match: Match): LiveMatch {
+  static mapToLiveMatch(match: Match): LiveMatch {
     return {
       id: match.id.toString(),
       homeTeam: match.homeTeam.name,
@@ -86,7 +82,10 @@ export class LandingPresenter {
       homeScore: match.score.home ?? 0,
       awayScore: match.score.away ?? 0,
       minute: match.minute ?? 0,
-      status: match.status === "live" || match.status === "in_play" ? "live" : "upcoming",
+      status:
+        match.status === "live" || match.status === "in_play"
+          ? "live"
+          : "upcoming",
       league: match.league.name,
       homeLogo: match.homeTeam.logo || "⚽",
       awayLogo: match.awayTeam.logo || "⚽",
@@ -96,7 +95,7 @@ export class LandingPresenter {
   /**
    * Map API Standing to LeagueStanding view model
    */
-  private mapToLeagueStanding(standing: Standing): LeagueStanding {
+  static mapToLeagueStanding(standing: Standing): LeagueStanding {
     return {
       position: standing.position,
       team: standing.team.name,
@@ -112,7 +111,13 @@ export class LandingPresenter {
       form: standing.form || [],
     };
   }
+}
 
+/**
+ * Landing Presenter
+ * Integrates with Football API for real data
+ */
+export class LandingPresenter {
   /**
    * Get fallback data when API fails
    */
@@ -151,31 +156,41 @@ export class LandingPresenter {
     };
   }
 
+  private async getApiData() {
+    // Fetch real data from Football API
+    const [liveMatchesData, standingsData] = await Promise.all([
+      getLiveMatches().catch(() => [] as Match[]),
+      getStandingsByLeague(LEAGUE_IDS.PREMIER_LEAGUE).catch(
+        () => [] as Standing[]
+      ),
+    ]);
+
+    // Map to view models
+    const liveMatches = liveMatchesData
+      .slice(0, 3)
+      .map((match) => LandingPresenterMapper.mapToLiveMatch(match));
+
+    const leagueStandings = standingsData
+      .slice(0, 5)
+      .map((standing) => LandingPresenterMapper.mapToLeagueStanding(standing));
+
+    return {
+      liveMatches,
+      leagueStandings,
+    };
+  }
+
   /**
    * Get view model with real API data
    */
   async getViewModel(): Promise<LandingViewModel> {
     try {
-      // Fetch real data from Football API
-      const [liveMatchesData, standingsData] = await Promise.all([
-        getLiveMatches().catch(() => [] as Match[]),
-        getStandingsByLeague(LEAGUE_IDS.PREMIER_LEAGUE).catch(() => [] as Standing[]),
-      ]);
-
-      // Map to view models
-      const liveMatches = liveMatchesData
-        .slice(0, 3)
-        .map((match) => this.mapToLiveMatch(match));
-
-      const leagueStandings = standingsData
-        .slice(0, 5)
-        .map((standing) => this.mapToLeagueStanding(standing));
-
       // Mock featured tactical posts (will be replaced with real data later)
       const featuredPosts: TacticalPost[] = [
         {
           id: "1",
-          title: "วิเคราะห์แทคติค 4-3-3 ของ Man City ที่ทำให้พวกเขาครองบอลได้มากกว่า 70%",
+          title:
+            "วิเคราะห์แทคติค 4-3-3 ของ Man City ที่ทำให้พวกเขาครองบอลได้มากกว่า 70%",
           author: "Tactical Genius",
           authorAvatar: "👨‍💼",
           excerpt:
@@ -203,7 +218,8 @@ export class LandingPresenter {
         },
         {
           id: "3",
-          title: "การกดตัวสูงของ Liverpool: High Press ที่มีประสิทธิภาพที่สุดในยุโรป",
+          title:
+            "การกดตัวสูงของ Liverpool: High Press ที่มีประสิทธิภาพที่สุดในยุโรป",
           author: "Press Master",
           authorAvatar: "⚡",
           excerpt:
@@ -221,7 +237,7 @@ export class LandingPresenter {
       const stats: LandingStats = {
         totalPosts: 1247,
         totalUsers: 8934,
-        totalMatches: liveMatchesData.length || 156,
+        totalMatches: 156,
         totalLeagues: 12,
       };
 
@@ -236,15 +252,15 @@ export class LandingPresenter {
       ];
 
       return {
-        liveMatches,
-        leagueStandings,
+        liveMatches: [],
+        leagueStandings: [],
         featuredPosts,
         stats,
         popularLeagues,
       };
     } catch (error) {
       console.error("Error fetching landing data:", error);
-      
+
       // Return fallback data if API fails
       return this.getFallbackData();
     }
@@ -262,8 +278,7 @@ export class LandingPresenter {
         "ฟุตบอล, แทคติค, วิเคราะห์, Premier League, La Liga, ตารางคะแนน, ผลบอลสด",
       openGraph: {
         title: "Soccer Tactics - แพลตฟอร์มวิเคราะห์แทคติคฟุตบอล",
-        description:
-          "แพลตฟอร์มโซเชียลสำหรับวิเคราะห์และวิจารณ์แทคติคฟุตบอล",
+        description: "แพลตฟอร์มโซเชียลสำหรับวิเคราะห์และวิจารณ์แทคติคฟุตบอล",
         type: "website",
       },
     };
@@ -274,7 +289,10 @@ export class LandingPresenter {
  * Factory for creating LandingPresenter instances
  */
 export class LandingPresenterFactory {
-  static async create(): Promise<LandingPresenter> {
+  static createClient(): LandingPresenter {
+    return new LandingPresenter();
+  }
+  static createServer(): LandingPresenter {
     return new LandingPresenter();
   }
 }

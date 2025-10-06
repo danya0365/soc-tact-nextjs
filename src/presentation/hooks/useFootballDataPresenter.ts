@@ -7,11 +7,14 @@
 import { useCallback } from "react";
 import { useFootballStore } from "@/src/stores/footballStore";
 import {
+  getLiveMatchesClient,
+  getStandingsByLeagueClient,
+} from "@/src/infrastructure/api/football-client.api";
+import {
   getAllLeagues,
   getLeagueById,
   getLeaguesByCountry,
   getLeagueOverview,
-  getLiveMatches,
   getTodayMatches,
   getMatchesByDate,
   getMatchesByLeague,
@@ -19,7 +22,6 @@ import {
   getUpcomingMatches,
   getFinishedMatches,
   getFeaturedMatches,
-  getStandingsByLeague,
   getTeamById,
   getTeamsByLeague,
   searchTeams,
@@ -113,8 +115,8 @@ export function useFootballDataPresenter() {
     const cached = store.getLiveMatches();
     if (cached) return cached;
 
-    // Fetch from API
-    const data = await getLiveMatches();
+    // Fetch from API (client-side proxy)
+    const data = await getLiveMatchesClient();
 
     // Save to cache
     store.setLiveMatches(data);
@@ -236,8 +238,8 @@ export function useFootballDataPresenter() {
       const cached = store.getStandingsByLeague(leagueId, season);
       if (cached) return cached;
 
-      // Fetch from API
-      const data = await getStandingsByLeague(leagueId, season);
+      // Fetch from API (client-side proxy)
+      const data = await getStandingsByLeagueClient(leagueId, season);
 
       // Save to cache
       store.setStandingsByLeague(leagueId, season, data);

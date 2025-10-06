@@ -3,15 +3,11 @@ import { LandingPresenterFactory } from "@/src/presentation/presenters/landing/L
 import type { Metadata } from "next";
 import Link from "next/link";
 
-// Tell Next.js this is a dynamic page
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
-
 /**
  * Generate metadata for the landing page
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const presenter = await LandingPresenterFactory.create();
+  const presenter = await LandingPresenterFactory.createServer();
 
   try {
     return await presenter.generateMetadata();
@@ -32,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * Uses presenter pattern following Clean Architecture
  */
 export default async function Home() {
-  const presenter = await LandingPresenterFactory.create();
+  const presenter = await LandingPresenterFactory.createServer();
 
   try {
     // Get view model from presenter
