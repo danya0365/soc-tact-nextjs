@@ -11,6 +11,8 @@ import {
   type Match,
   type Standing,
 } from "@/src/infrastructure/api";
+import { mockMatches } from "@/src/data/mock/matches.mock";
+import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
 
 // View Model interfaces for Landing Page
 export interface LiveMatch {
@@ -255,9 +257,41 @@ export class LandingPresenter {
       // Popular leagues
       const popularLeagues = await this.getPopularLeagues();
 
+      // Use mock data for landing page
+      const liveMatches = mockMatches
+        .filter((m) => m.status === "live" || m.status === "upcoming")
+        .slice(0, 4)
+        .map((match) => ({
+          id: match.id,
+          homeTeam: match.homeTeam.name,
+          awayTeam: match.awayTeam.name,
+          homeScore: match.score.home ?? 0,
+          awayScore: match.score.away ?? 0,
+          minute: match.minute ?? 0,
+          status: match.status as "live" | "finished" | "upcoming",
+          league: match.league.name,
+          homeLogo: "⚽",
+          awayLogo: "⚽",
+        }));
+
+      const leagueStandings = mockPremierLeagueStandings.slice(0, 5).map((s) => ({
+        position: s.position,
+        team: s.team.name,
+        logo: s.team.logo,
+        played: s.played,
+        won: s.won,
+        drawn: s.drawn,
+        lost: s.lost,
+        goalsFor: s.goalsFor,
+        goalsAgainst: s.goalsAgainst,
+        goalDifference: s.goalDifference,
+        points: s.points,
+        form: s.form,
+      }));
+
       return {
-        liveMatches: [],
-        leagueStandings: [],
+        liveMatches,
+        leagueStandings,
         featuredPosts,
         stats,
         popularLeagues,
