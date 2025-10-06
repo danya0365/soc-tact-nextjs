@@ -7,6 +7,16 @@ import {
   LandingViewModel,
 } from "./LandingPresenter";
 
+// Mapping league names to league IDs
+const LEAGUE_NAME_TO_ID: Record<string, number> = {
+  "Premier League": LEAGUE_IDS.PREMIER_LEAGUE,
+  "La Liga": LEAGUE_IDS.LA_LIGA,
+  "Serie A": LEAGUE_IDS.SERIE_A,
+  "Bundesliga": LEAGUE_IDS.BUNDESLIGA,
+  "Ligue 1": LEAGUE_IDS.LIGUE_1,
+  "Thai Premier League": LEAGUE_IDS.PREMIER_LEAGUE, // Fallback to Premier League
+};
+
 const presenter = LandingPresenterFactory.createClient();
 
 export interface LandingPresenterState {
@@ -40,7 +50,42 @@ export function useLandingPresenter(
   const footballData = useFootballDataPresenter();
 
   /**
-   * Load data from cache or API
+   * Load standings for selected league
+   */
+  const loadStandingsByLeague = useCallback(
+    async (leagueName: string) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const leagueId = LEAGUE_NAME_TO_ID[leagueName] || LEAGUE_IDS.PREMIER_LEAGUE;
+        const standings = await footballData.fetchStandingsByLeague(leagueId);
+
+        const mappedStandings = standings
+          .slice(0, 5)
+          .map((standing) => LandingPresenterMapper.mapToLeagueStanding(standing));
+
+        // Update only standings, keep other data
+        setViewModel((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            leagueStandings: mappedStandings,
+          };
+        });
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
+        console.error("Error loading standings:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [footballData]
+  );
+
+  /**
+   * Load initial data from cache or API
    * Check cache first via useFootballDataPresenter, if not found fetch from API
    */
   const loadData = useCallback(async () => {
@@ -50,9 +95,11 @@ export function useLandingPresenter(
     try {
       // Fetch data with caching from useFootballDataPresenter
       // This will check cache first, if not found it will call API and save to cache
+      const leagueId = LEAGUE_NAME_TO_ID[selectedLeague] || LEAGUE_IDS.PREMIER_LEAGUE;
+      
       const [liveMatches, standings] = await Promise.all([
         footballData.fetchLiveMatches(),
-        footballData.fetchStandingsByLeague(LEAGUE_IDS.PREMIER_LEAGUE),
+        footballData.fetchStandingsByLeague(leagueId),
       ]);
 
       const mappedLiveMatches = liveMatches
@@ -85,7 +132,7 @@ export function useLandingPresenter(
     } finally {
       setLoading(false);
     }
-  }, [footballData]);
+  }, [footballData, selectedLeague]);
 
   /**
    * Load data from cache or API
@@ -95,16 +142,23 @@ export function useLandingPresenter(
     await loadData();
   }, [loadData]);
 
-  const handleSetSelectedLeague = useCallback((league: string) => {
-    setSelectedLeague(league);
-  }, []);
+  const handleSetSelectedLeague = useCallback(
+    (league: string) => {
+      setSelectedLeague(league);
+      // Load standings for the newly selected league
+      loadStandingsByLeague(league);
+    },
+    [loadStandingsByLeague]
+  );
 
   const handleSetError = useCallback((error: string | null) => {
     setError(error);
   }, []);
 
+  // Load initial data on mount
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return [
