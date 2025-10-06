@@ -15,6 +15,7 @@ export function Navbar() {
     { href: "/matches", label: "ผลบอลสด", icon: "⚽" },
     { href: "/leagues", label: "ตารางคะแนน", icon: "🏆" },
     { href: "/tactics", label: "วิเคราะห์แทคติค", icon: "🎨" },
+    { href: "/fantasy", label: "Fantasy", icon: "⭐" },
     { href: "/explore", label: "สำรวจ", icon: "🔍" },
   ];
 

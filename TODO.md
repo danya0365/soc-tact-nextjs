@@ -505,6 +505,285 @@ Since UI is 100% complete, you have 3 options:
 
 ---
 
+## 🏆 Phase 2.6: Football Fantasy Feature (NEW)
+
+### 🎯 Overview
+ระบบ Fantasy Football คล้าย https://fantasy.premierleague.com/ ที่ให้ผู้เล่นสร้างทีมในฝันและแข่งขันกับเพื่อน
+
+### 📋 Phase 2.6.1: UI Development with Mock Data (Priority)
+
+#### 1. **Fantasy Dashboard** (`/fantasy`)
+- [ ] Hero Section
+  - [ ] Current Gameweek display
+  - [ ] User's total points
+  - [ ] Global rank & league rank
+  - [ ] Transfer deadline countdown
+- [ ] My Team Overview
+  - [ ] Formation display (pitch view)
+  - [ ] Starting XI with player cards
+  - [ ] Bench players
+  - [ ] Team value & budget remaining
+  - [ ] Captain & Vice-captain badges
+- [ ] Gameweek Points Breakdown
+  - [ ] Points per player
+  - [ ] Bonus points
+  - [ ] Auto-substitutions
+- [ ] Quick Actions
+  - [ ] Make Transfers button
+  - [ ] View Fixtures button
+  - [ ] Join League button
+
+#### 2. **Squad Selection** (`/fantasy/squad`)
+- [ ] Budget Display
+  - [ ] Total budget (e.g., 100M)
+  - [ ] Remaining budget
+  - [ ] Team value
+- [ ] Formation Selector
+  - [ ] 3-4-3, 3-5-2, 4-3-3, 4-4-2, 4-5-1, 5-3-2, 5-4-1
+  - [ ] Visual formation preview
+- [ ] Player Selection Interface
+  - [ ] Position tabs (GK, DEF, MID, FWD)
+  - [ ] Player list with filters
+    - [ ] By team
+    - [ ] By price range
+    - [ ] By form
+    - [ ] By points
+  - [ ] Player cards showing:
+    - [ ] Name, team, position
+    - [ ] Price
+    - [ ] Total points
+    - [ ] Form (last 5 games)
+    - [ ] Next fixture difficulty
+  - [ ] Add/Remove player actions
+- [ ] Pitch View
+  - [ ] Drag & drop players
+  - [ ] Set captain (2x points)
+  - [ ] Set vice-captain
+  - [ ] Bench order
+- [ ] Squad Rules Validation
+  - [ ] Max 3 players per team
+  - [ ] Required positions (2 GK, 5 DEF, 5 MID, 3 FWD)
+  - [ ] Budget constraints
+  - [ ] 15 players total
+
+#### 3. **Transfers** (`/fantasy/transfers`)
+- [ ] Current Squad Display
+  - [ ] Formation view
+  - [ ] Player stats
+  - [ ] Transfer out button per player
+- [ ] Transfer Planning
+  - [ ] Free transfers available
+  - [ ] Points deduction warning (-4 per extra transfer)
+  - [ ] Transfer deadline countdown
+- [ ] Player Search & Compare
+  - [ ] Search by name
+  - [ ] Filter by position, team, price
+  - [ ] Sort by points, form, value
+  - [ ] Compare stats side-by-side
+- [ ] Transfer List
+  - [ ] Players out
+  - [ ] Players in
+  - [ ] Net cost
+  - [ ] Confirm transfers button
+- [ ] Wildcard & Chips
+  - [ ] Wildcard (unlimited transfers)
+  - [ ] Bench Boost
+  - [ ] Triple Captain
+  - [ ] Free Hit
+  - [ ] Chip activation UI
+
+#### 4. **Points & Statistics** (`/fantasy/points`)
+- [ ] Gameweek History
+  - [ ] Points per gameweek (chart)
+  - [ ] Rank progression
+  - [ ] Transfers made
+  - [ ] Chips used
+- [ ] Player Performance Table
+  - [ ] All players in squad history
+  - [ ] Points scored
+  - [ ] Minutes played
+  - [ ] Goals, assists, clean sheets
+  - [ ] Bonus points
+- [ ] Season Statistics
+  - [ ] Total points
+  - [ ] Best gameweek
+  - [ ] Worst gameweek
+  - [ ] Average points
+  - [ ] Most valuable player
+  - [ ] Best transfer in/out
+
+#### 5. **Fixtures & Player Stats** (`/fantasy/fixtures`)
+- [ ] Gameweek Fixtures
+  - [ ] All matches for current gameweek
+  - [ ] Difficulty rating per team
+  - [ ] Fixture ticker (next 5 gameweeks)
+- [ ] Player Stats Database
+  - [ ] Searchable player list
+  - [ ] Detailed stats per player:
+    - [ ] Price, ownership %
+    - [ ] Total points, PPG
+    - [ ] Goals, assists, clean sheets
+    - [ ] Bonus points
+    - [ ] Form (last 5)
+    - [ ] ICT Index (Influence, Creativity, Threat)
+  - [ ] Sort & filter options
+- [ ] Fixture Difficulty Tracker
+  - [ ] Visual difficulty rating (1-5)
+  - [ ] Color-coded fixtures
+  - [ ] Next 5 fixtures per team
+
+#### 6. **Leagues** (`/fantasy/leagues`)
+- [ ] My Leagues List
+  - [ ] Overall global league
+  - [ ] Private leagues joined
+  - [ ] League name, rank, points
+  - [ ] View league button
+- [ ] Create Private League
+  - [ ] League name input
+  - [ ] League code generation
+  - [ ] Invite friends
+- [ ] Join Private League
+  - [ ] Enter league code
+  - [ ] Join button
+- [ ] League Standings (`/fantasy/leagues/[id]`)
+  - [ ] Leaderboard table
+  - [ ] Rank, team name, manager, points
+  - [ ] Gameweek points
+  - [ ] Overall points
+  - [ ] Pagination
+  - [ ] League info & code
+
+#### 7. **Player Detail Modal**
+- [ ] Player Header
+  - [ ] Photo, name, team, position
+  - [ ] Price & price change indicator
+  - [ ] Ownership percentage
+- [ ] Performance Stats
+  - [ ] Total points, PPG
+  - [ ] Goals, assists, clean sheets
+  - [ ] Bonus points
+  - [ ] Minutes played
+- [ ] Form & Fixtures
+  - [ ] Last 5 gameweeks performance
+  - [ ] Next 5 fixtures with difficulty
+  - [ ] Points prediction
+- [ ] Price History
+  - [ ] Price change graph
+  - [ ] Transfer trends
+- [ ] Add to Squad Button
+
+#### 8. **Rules & Help** (`/fantasy/rules`)
+- [ ] How to Play
+  - [ ] Getting started guide
+  - [ ] Squad selection rules
+  - [ ] Scoring system
+  - [ ] Transfers & chips
+- [ ] Scoring Rules
+  - [ ] Points per action (goals, assists, clean sheets, etc.)
+  - [ ] Bonus points system
+  - [ ] Captain rules
+- [ ] FAQ Section
+  - [ ] Common questions
+  - [ ] Troubleshooting
+
+### 📊 Phase 2.6.2: Mock Data Structure
+
+#### Fantasy Mock Data Files
+- [ ] `/src/data/mock/fantasy/`
+  - [ ] `players.mock.ts` - 500+ players with stats
+    - [ ] Player info (name, team, position, price)
+    - [ ] Performance stats (points, goals, assists, clean sheets)
+    - [ ] Form data (last 5 gameweeks)
+    - [ ] Fixture difficulty
+    - [ ] Ownership percentage
+  - [ ] `gameweeks.mock.ts` - Gameweek data
+    - [ ] Gameweek number, deadline
+    - [ ] Fixtures per gameweek
+    - [ ] Average points
+    - [ ] Highest score
+  - [ ] `teams.mock.ts` - Fantasy teams (user squads)
+    - [ ] Squad composition
+    - [ ] Formation
+    - [ ] Captain selection
+    - [ ] Bench order
+    - [ ] Total points
+  - [ ] `leagues.mock.ts` - League standings
+    - [ ] League info
+    - [ ] Standings table
+    - [ ] Manager teams
+  - [ ] `transfers.mock.ts` - Transfer history
+    - [ ] Transfers in/out
+    - [ ] Gameweek
+    - [ ] Cost
+  - [ ] `fixtures.mock.ts` - Fixture difficulty
+    - [ ] Team fixtures
+    - [ ] Difficulty rating (1-5)
+
+### 🎨 Phase 2.6.3: Component Library
+
+#### Fantasy-Specific Components
+- [ ] **PlayerCard** - Player display card
+  - [ ] Compact view (list)
+  - [ ] Detailed view (modal)
+  - [ ] Pitch view (formation)
+- [ ] **FormationPitch** - Interactive pitch with players
+  - [ ] Drag & drop support
+  - [ ] Captain badge overlay
+  - [ ] Substitution arrows
+- [ ] **PlayerPicker** - Player selection interface
+  - [ ] Search & filters
+  - [ ] Sort options
+  - [ ] Add/remove actions
+- [ ] **FixtureDifficultyBar** - Visual difficulty indicator
+  - [ ] Color-coded (green=easy, red=hard)
+  - [ ] Next 5 fixtures
+- [ ] **PointsBreakdown** - Detailed points display
+  - [ ] Per-player breakdown
+  - [ ] Bonus points
+  - [ ] Auto-subs
+- [ ] **TransferPlanner** - Transfer interface
+  - [ ] Player in/out
+  - [ ] Cost calculation
+  - [ ] Validation warnings
+- [ ] **ChipSelector** - Activate chips
+  - [ ] Wildcard, Bench Boost, Triple Captain, Free Hit
+  - [ ] Usage status
+- [ ] **LeagueTable** - League standings
+  - [ ] Rank, team, points
+  - [ ] Gameweek points
+  - [ ] Pagination
+
+### 🚀 Phase 2.6.4: Implementation Priority
+
+**Week 1: Core UI (8-10 hours)**
+1. Fantasy Dashboard page with mock data
+2. Squad Selection page with formation picker
+3. Player cards and pitch view components
+4. Basic player stats display
+
+**Week 2: Transfers & Stats (8-10 hours)**
+1. Transfers page with player search
+2. Points & Statistics page
+3. Fixtures & Player Stats page
+4. Player detail modal
+
+**Week 3: Leagues & Polish (6-8 hours)**
+1. Leagues pages (list, create, join, standings)
+2. Rules & Help page
+3. Mobile responsive design
+4. Animations & transitions
+
+**Total Estimated Time: 22-28 hours**
+
+### 📝 Notes
+- Start with UI and mock data only
+- Backend integration in Phase 3
+- Real-time scoring in Phase 4
+- Focus on Premier League first, expand later
+- Mobile-first design approach
+
+---
+
 ## 🔌 Phase 3: Backend Integration & Real Data
 
 ### 3.0 Database Schema Implementation ✅ COMPLETED
