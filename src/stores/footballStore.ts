@@ -12,15 +12,8 @@ import type {
   Team,
   TopScorer,
 } from "@/src/domain/entities/football.entity";
-import localforage from "localforage";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-
-// Initialize localforage instance
-localforage.config({
-  name: "soc-tact",
-  storeName: "football",
-});
+import { persist } from "zustand/middleware";
 
 // Cache duration in milliseconds
 const CACHE_DURATION = {
@@ -198,6 +191,43 @@ function createCacheEntry<T>(data: T): CacheEntry<T> {
   };
 }
 
+// Custom storage for browser-only (client-side)
+// Using localStorage for better Next.js SSR compatibility
+// Storage limit: ~5-10 MB (sufficient for football data caching)
+const createBrowserStorage = () => {
+  // Check if we're in browser environment
+  if (typeof window === "undefined") {
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    };
+  }
+
+  return {
+    getItem: (name: string) => {
+      const str = localStorage.getItem(name);
+      if (!str) return null;
+      try {
+        return JSON.parse(str);
+      } catch {
+        return null;
+      }
+    },
+    setItem: (name: string, value: unknown) => {
+      try {
+        localStorage.setItem(name, JSON.stringify(value));
+      } catch (error) {
+        console.warn("localStorage quota exceeded, clearing cache", error);
+        localStorage.removeItem(name);
+      }
+    },
+    removeItem: (name: string) => {
+      localStorage.removeItem(name);
+    },
+  };
+};
+
 // Create store
 export const useFootballStore = create<FootballStoreState>()(
   persist(
@@ -281,13 +311,20 @@ export const useFootballStore = create<FootballStoreState>()(
       setFeaturedMatches: (data) =>
         set({ featuredMatches: createCacheEntry(data) }),
 
-      setStandingsByLeague: (leagueId, season, data) =>
+      setStandingsByLeague: (leagueId, season, data) => {
+        const key = `${leagueId}-${season || "current"}`;
+        console.log("setStandingsByLeague", {
+          key,
+          dataLength: data?.length,
+          data: data,
+        });
         set((state) => ({
           standingsByLeague: {
             ...state.standingsByLeague,
-            [`${leagueId}-${season || "current"}`]: createCacheEntry(data),
+            [key]: createCacheEntry(data),
           },
-        })),
+        }));
+      },
 
       setTeamById: (id, data) =>
         set((state) => ({
@@ -439,8 +476,16 @@ export const useFootballStore = create<FootballStoreState>()(
       },
 
       getStandingsByLeague: (leagueId, season) => {
-        const cache =
-          get().standingsByLeague[`${leagueId}-${season || "current"}`];
+        const key = `${leagueId}-${season || "current"}`;
+        const cache = get().standingsByLeague[key];
+        console.log("getStandingsByLeague", {
+          key,
+          cache,
+          allKeys: Object.keys(get().standingsByLeague),
+          isValid: cache
+            ? isCacheValid(cache.lastUpdate, CACHE_DURATION.STANDINGS)
+            : false,
+        });
         if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.STANDINGS)) {
           return cache.data;
         }
@@ -569,7 +614,7 @@ export const useFootballStore = create<FootballStoreState>()(
     }),
     {
       name: "football-storage",
-      storage: createJSONStorage(() => localforage),
+      storage: createBrowserStorage(),
     }
   )
 );
