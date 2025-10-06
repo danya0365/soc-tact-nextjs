@@ -729,21 +729,34 @@ Since UI is 100% complete, you have 3 options:
 - All pages working
 - Routes: `/fantasy/*`
 
-### 🚀 Phase 2.6.5: Next Steps (Optional Enhancements)
+### ✅ Phase 2.6.5: Advanced Features - COMPLETED
 
-#### 🔹 Advanced Features (Nice to have)
-- [ ] **Player Detail Modal** - Full player stats popup
-  - [ ] Player Header with photo
-  - [ ] Performance Stats
-  - [ ] Form & Fixtures
-  - [ ] Price History graph
-  - [ ] Add to Squad Button
+#### 🔹 Advanced Features (Completed)
+- [x] **Player Detail Modal** ✅ - Full player stats popup
+  - [x] Player Header with stats
+  - [x] Performance Stats (3 tabs)
+  - [x] Form & Fixtures (5 games + 5 fixtures)
+  - [x] Form chart visualization
+  - [x] Add to Squad Button
+  - [x] Integrated in Squad Selection & Fixtures pages
 
-- [ ] **Rules & Help Page** (`/fantasy/rules`)
-  - [ ] How to Play guide
-  - [ ] Scoring system explanation
-  - [ ] FAQ Section
+- [x] **Rules & Help Page** ✅ (`/fantasy/rules`)
+  - [x] How to Play guide (Quick Start + Detailed)
+  - [x] Scoring system explanation (by position)
+  - [x] FAQ Section (6 questions)
+  - [x] Chips explanation (4 chips)
+  - [x] Tips & Suggestions
 
+- [x] **My Team Detail Page** ✅ (`/fantasy/my-team`)
+  - [x] Detailed team display with pitch view
+  - [x] Team statistics (value, average points, age)
+  - [x] Formation analysis (strengths/weaknesses)
+  - [x] Player stats table
+  - [x] Top performers section
+  - [x] Upcoming fixtures difficulty
+  - [x] Quick actions
+
+#### 🔹 Future Enhancements (Nice to have)
 - [ ] **Drag & Drop Squad Builder**
   - [ ] Drag players to pitch
   - [ ] Visual squad validation

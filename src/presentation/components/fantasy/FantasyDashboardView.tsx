@@ -169,12 +169,20 @@ export default function FantasyDashboardView({
                     แบบฟอร์เมชั่น {team.formation}
                   </p>
                 </div>
-                <Link
-                  href="/fantasy/squad"
-                  className="px-4 py-2 bg-white text-green-700 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-                >
-                  แก้ไขทีม
-                </Link>
+                <div className="flex gap-2">
+                  <Link
+                    href="/fantasy/my-team"
+                    className="px-4 py-2 bg-white/20 text-white rounded-lg font-semibold hover:bg-white/30 transition-colors"
+                  >
+                    ดูรายละเอียด
+                  </Link>
+                  <Link
+                    href="/fantasy/squad"
+                    className="px-4 py-2 bg-white text-green-700 rounded-lg font-semibold hover:bg-green-50 transition-colors"
+                  >
+                    แก้ไขทีม
+                  </Link>
+                </div>
               </div>
 
               {/* Football Pitch */}
