@@ -51,20 +51,236 @@
 
 ---
 
-## 🏠 Phase 2: Landing Page & Authentication
+## 🎨 Phase 2: UI Development with Mock Data (Current Focus)
 
-### 2.1 Landing Page
-- [ ] Hero section with pitch background
-- [ ] Feature showcase
-  - [ ] Tactical analysis tools
-  - [ ] Live scores
-  - [ ] League tables
-  - [ ] Community features
-- [ ] Statistics section
-- [ ] Call-to-action sections
-- [ ] Footer with links
+### 2.0 UI Pages Priority List
+**Strategy: Build UI first with Mock Data, then integrate real API later**
 
-### 2.2 Authentication System
+#### 🏠 **Landing Page** (In Progress)
+- [x] Basic structure with LandingPresenter
+- [x] Football API integration setup
+- [ ] Complete Hero section
+  - [ ] Pitch background with gradient overlay
+  - [ ] Main headline & tagline
+  - [ ] CTA buttons (เข้าสู่ระบบ, สมัครสมาชิก)
+  - [ ] Search bar for matches/teams
+- [ ] Live Matches Section (Mock Data)
+  - [ ] Match cards with live indicator
+  - [ ] Score display
+  - [ ] Team logos & names
+  - [ ] Match time/status
+  - [ ] Quick filters (All, Live, Today, Tomorrow)
+- [ ] League Tables Preview (Mock Data)
+  - [ ] Top 5 teams from popular leagues
+  - [ ] League selector tabs
+  - [ ] Mini table with position, team, points
+  - [ ] "View Full Table" link
+- [ ] Featured Tactical Posts (Mock Data)
+  - [ ] Post cards with thumbnail
+  - [ ] Formation badge
+  - [ ] Author info
+  - [ ] Upvotes & comments count
+  - [ ] "Read More" link
+- [ ] Statistics Section
+  - [ ] Total posts, users, matches, leagues
+  - [ ] Animated counters
+  - [ ] Icon representations
+- [ ] Popular Leagues Carousel
+  - [ ] League logos
+  - [ ] League names
+  - [ ] Click to view league page
+- [ ] Footer
+  - [ ] About, Contact, Terms, Privacy links
+  - [ ] Social media links
+  - [ ] Newsletter signup
+
+#### ⚽ **Match Center Pages**
+- [ ] `/matches` - All Matches Page (Mock Data)
+  - [ ] Filter bar (Date, League, Status)
+  - [ ] Match list with cards
+  - [ ] Pagination
+  - [ ] Live indicator animation
+  - [ ] Empty state for no matches
+- [ ] `/matches/[id]` - Match Detail Page (Mock Data)
+  - [ ] Match header (teams, score, time)
+  - [ ] Match statistics (possession, shots, etc.)
+  - [ ] Team lineups (formation view)
+  - [ ] Match timeline/events
+  - [ ] Head-to-head history
+  - [ ] Related tactical posts
+  - [ ] Comments section
+
+#### 📊 **League Tables Pages**
+- [ ] `/leagues` - All Leagues Page (Mock Data)
+  - [ ] League cards grid
+  - [ ] League logos & names
+  - [ ] Current season info
+  - [ ] "View Table" button
+- [ ] `/leagues/[id]` - League Table Page (Mock Data)
+  - [ ] Full standings table
+  - [ ] Position, team, stats (P, W, D, L, GF, GA, GD, Pts)
+  - [ ] Form indicators (last 5 matches)
+  - [ ] Highlight zones (Champions League, Europa, Relegation)
+  - [ ] Filter (Overall, Home, Away)
+  - [ ] Top scorers section
+  - [ ] Upcoming fixtures
+
+#### 🎨 **Tactical Analysis Pages**
+- [ ] `/tactics` - Tactics Feed Page (Mock Data)
+  - [ ] Post cards grid/list view toggle
+  - [ ] Filter by formation, league, date
+  - [ ] Sort by (Latest, Popular, Trending)
+  - [ ] Search functionality
+  - [ ] Infinite scroll/pagination
+- [ ] `/tactics/[id]` - Tactical Post Detail (Mock Data)
+  - [ ] Post title & metadata
+  - [ ] Author profile card
+  - [ ] Rich text content
+  - [ ] Tactical diagrams/images
+  - [ ] Formation visualization
+  - [ ] Related match context
+  - [ ] Tags & categories
+  - [ ] Upvote/downvote buttons
+  - [ ] Comments section
+  - [ ] Share buttons
+  - [ ] Related posts
+- [ ] `/tactics/create` - Create Tactical Post (Mock Data)
+  - [ ] Rich text editor
+  - [ ] Formation selector
+  - [ ] Pitch canvas/editor (basic)
+  - [ ] Image upload
+  - [ ] Match/team linking
+  - [ ] Tags input
+  - [ ] Preview mode
+  - [ ] Save draft
+  - [ ] Publish button
+
+#### 👤 **User Profile Pages**
+- [ ] `/profile/[username]` - Public Profile (Mock Data)
+  - [ ] Profile header (avatar, name, bio)
+  - [ ] Stats (posts, followers, following)
+  - [ ] Favorite teams & leagues
+  - [ ] Tactical philosophy
+  - [ ] User's posts feed
+  - [ ] Follow/unfollow button
+- [ ] `/profile/settings` - Profile Settings (Mock Data)
+  - [ ] Edit profile form
+  - [ ] Avatar upload
+  - [ ] Favorite teams selector
+  - [ ] Notification preferences
+  - [ ] Privacy settings
+
+#### 🔐 **Authentication Pages**
+- [ ] `/auth/login` - Login Page
+  - [ ] Email/password form
+  - [ ] Social login buttons (Google, Facebook)
+  - [ ] "Forgot password" link
+  - [ ] "Sign up" link
+  - [ ] Football-themed background
+- [ ] `/auth/register` - Register Page
+  - [ ] Registration form
+  - [ ] Email verification notice
+  - [ ] Terms & conditions checkbox
+  - [ ] Social signup buttons
+- [ ] `/auth/forgot-password` - Forgot Password
+  - [ ] Email input form
+  - [ ] Reset instructions
+- [ ] `/auth/setup` - Profile Setup Wizard
+  - [ ] Step 1: Favorite teams
+  - [ ] Step 2: Favorite leagues
+  - [ ] Step 3: Preferred formations
+  - [ ] Progress indicator
+
+#### 🔍 **Search & Discovery Pages**
+- [ ] `/search` - Search Results Page (Mock Data)
+  - [ ] Search input with suggestions
+  - [ ] Tabs (All, Posts, Users, Teams, Matches)
+  - [ ] Filter sidebar
+  - [ ] Results grid/list
+  - [ ] Pagination
+- [ ] `/explore` - Explore/Discovery Page (Mock Data)
+  - [ ] Trending posts
+  - [ ] Hot topics
+  - [ ] Featured analysts
+  - [ ] Popular formations
+  - [ ] League highlights
+
+#### 🏆 **Team Pages**
+- [ ] `/teams/[id]` - Team Profile Page (Mock Data)
+  - [ ] Team header (logo, name, stadium)
+  - [ ] Current squad list
+  - [ ] Recent matches
+  - [ ] Upcoming fixtures
+  - [ ] Team statistics
+  - [ ] Tactical analysis posts about team
+  - [ ] Follow button
+
+### 2.1 Component Library (Shared Components)
+- [ ] **Layout Components**
+  - [ ] MainLayout (with header, footer)
+  - [ ] AuthLayout (for login/register)
+  - [ ] DashboardLayout (for user dashboard)
+- [ ] **Navigation Components**
+  - [ ] Navbar (with search, user menu)
+  - [ ] Sidebar (for filters)
+  - [ ] Breadcrumbs
+  - [ ] Tabs
+- [ ] **Card Components**
+  - [ ] MatchCard (live, upcoming, finished)
+  - [ ] PostCard (tactical analysis)
+  - [ ] TeamCard
+  - [ ] LeagueCard
+  - [ ] UserCard
+- [ ] **Data Display**
+  - [ ] LeagueTable (standings)
+  - [ ] FormationPitch (tactical view)
+  - [ ] MatchTimeline
+  - [ ] StatisticsBar
+  - [ ] ProgressBar
+- [ ] **Form Components**
+  - [ ] Input (text, email, password)
+  - [ ] TextArea
+  - [ ] Select/Dropdown
+  - [ ] Checkbox/Radio
+  - [ ] DatePicker
+  - [ ] SearchInput
+- [ ] **Feedback Components**
+  - [ ] Button (primary, secondary, ghost)
+  - [ ] Badge (status, formation, league)
+  - [ ] Alert/Toast
+  - [ ] Modal/Dialog
+  - [ ] Loading Spinner
+  - [ ] Empty State
+  - [ ] Error State
+- [ ] **Interactive Components**
+  - [ ] VoteButtons (upvote/downvote)
+  - [ ] ShareButtons
+  - [ ] FollowButton
+  - [ ] CommentBox
+  - [ ] ReactionPicker
+
+### 2.2 Mock Data Structure
+- [ ] Create `/src/data/mock/` folder
+- [ ] **matches.mock.ts** - Mock match data
+- [ ] **leagues.mock.ts** - Mock league data
+- [ ] **teams.mock.ts** - Mock team data
+- [ ] **posts.mock.ts** - Mock tactical posts
+- [ ] **users.mock.ts** - Mock user profiles
+- [ ] **comments.mock.ts** - Mock comments
+- [ ] **standings.mock.ts** - Mock league standings
+
+---
+
+## 🔌 Phase 3: API Integration & Real Data
+
+### 3.1 Connect Real Football API
+- [ ] Replace mock data with real API calls
+- [ ] Setup error handling & fallbacks
+- [ ] Implement caching strategy
+- [ ] Add loading states
+- [ ] Setup real-time updates (WebSocket/polling)
+
+### 3.2 Authentication Integration
 - [ ] Login page
 - [ ] Register page
 - [ ] Forgot password
@@ -77,7 +293,7 @@
 
 ---
 
-## ⚽ Phase 3: Live Score & Match Center
+## 💾 Phase 4: Database & Backend Setup
 
 ### 3.1 Live Score Integration
 - [ ] Choose football API provider

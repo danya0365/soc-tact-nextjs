@@ -180,6 +180,17 @@ export class LandingPresenter {
     };
   }
 
+  private async getPopularLeagues() {
+    return [
+      "Premier League",
+      "La Liga",
+      "Serie A",
+      "Bundesliga",
+      "Ligue 1",
+      "Thai Premier League",
+    ];
+  }
+
   /**
    * Get view model with real API data
    */
@@ -242,14 +253,7 @@ export class LandingPresenter {
       };
 
       // Popular leagues
-      const popularLeagues = [
-        "Premier League",
-        "La Liga",
-        "Serie A",
-        "Bundesliga",
-        "Ligue 1",
-        "Thai Premier League",
-      ];
+      const popularLeagues = await this.getPopularLeagues();
 
       return {
         liveMatches: [],
