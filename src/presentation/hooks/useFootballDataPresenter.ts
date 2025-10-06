@@ -4,32 +4,30 @@
  * This is the proper layer to integrate infrastructure with state management
  */
 
-import { useCallback } from "react";
-import { useFootballStore } from "@/src/stores/footballStore";
 import {
+  getAllLeaguesClient,
+  getFeaturedMatchesClient,
+  getFinishedMatchesClient,
+  getHeadToHeadClient,
+  getLeagueByIdClient,
+  getLeagueOverviewClient,
+  getLeaguesByCountryClient,
   getLiveMatchesClient,
+  getMatchByIdClient,
+  getMatchesByDateClient,
+  getMatchesByLeagueClient,
   getStandingsByLeagueClient,
+  getTeamByIdClient,
+  getTeamRecentMatchesClient,
+  getTeamsByLeagueClient,
+  getTeamUpcomingMatchesClient,
+  getTodayMatchesClient,
+  getTopScorersClient,
+  getUpcomingMatchesClient,
+  searchTeamsClient,
 } from "@/src/infrastructure/api/football-client.api";
-import {
-  getAllLeagues,
-  getLeagueById,
-  getLeaguesByCountry,
-  getLeagueOverview,
-  getTodayMatches,
-  getMatchesByDate,
-  getMatchesByLeague,
-  getMatchById,
-  getUpcomingMatches,
-  getFinishedMatches,
-  getFeaturedMatches,
-  getTeamById,
-  getTeamsByLeague,
-  searchTeams,
-  getTeamRecentMatches,
-  getTeamUpcomingMatches,
-  getTopScorers,
-  getHeadToHead,
-} from "@/src/infrastructure/api";
+import { useFootballStore } from "@/src/stores/footballStore";
+import { useCallback } from "react";
 
 /**
  * Hook for managing football data with caching
@@ -47,7 +45,7 @@ export function useFootballDataPresenter() {
     if (cached) return cached;
 
     // Fetch from API
-    const data = await getAllLeagues();
+    const data = await getAllLeaguesClient();
 
     // Save to cache
     store.setLeagues(data);
@@ -62,7 +60,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getLeagueById(leagueId);
+      const data = await getLeagueByIdClient(leagueId);
 
       // Save to cache
       store.setLeagueById(leagueId, data);
@@ -79,7 +77,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getLeaguesByCountry(country);
+      const data = await getLeaguesByCountryClient(country);
 
       // Save to cache
       store.setLeaguesByCountry(country, data);
@@ -96,7 +94,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getLeagueOverview(leagueId, season);
+      const data = await getLeagueOverviewClient(leagueId, season);
 
       // Save to cache
       store.setLeagueOverview(leagueId, season, data);
@@ -125,8 +123,7 @@ export function useFootballDataPresenter() {
   }, [store]);
 
   const fetchTodayMatches = useCallback(async () => {
-    const today = new Date().toISOString().split("T")[0];
-    return fetchMatchesByDate(today);
+    return getTodayMatchesClient();
   }, []);
 
   const fetchMatchesByDate = useCallback(
@@ -136,7 +133,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getMatchesByDate(date);
+      const data = await getMatchesByDateClient(date);
 
       // Save to cache
       store.setMatchesByDate(date, data);
@@ -153,7 +150,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getMatchesByLeague(leagueId, season);
+      const data = await getMatchesByLeagueClient(leagueId, season);
 
       // Save to cache
       store.setMatchesByLeague(leagueId, season, data);
@@ -170,7 +167,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getMatchById(matchId);
+      const data = await getMatchByIdClient(matchId);
 
       // Save to cache
       store.setMatchById(matchId, data);
@@ -187,7 +184,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getUpcomingMatches(leagueId);
+      const data = await getUpcomingMatchesClient(leagueId);
 
       // Save to cache
       store.setUpcomingMatches(leagueId, data);
@@ -204,7 +201,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getFinishedMatches(leagueId);
+      const data = await getFinishedMatchesClient(leagueId);
 
       // Save to cache
       store.setFinishedMatches(leagueId, data);
@@ -220,7 +217,7 @@ export function useFootballDataPresenter() {
     if (cached) return cached;
 
     // Fetch from API
-    const data = await getFeaturedMatches();
+    const data = await getFeaturedMatchesClient();
 
     // Save to cache
     store.setFeaturedMatches(data);
@@ -260,7 +257,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getTeamById(teamId);
+      const data = await getTeamByIdClient(teamId);
 
       // Save to cache
       store.setTeamById(teamId, data);
@@ -277,7 +274,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getTeamsByLeague(leagueId);
+      const data = await getTeamsByLeagueClient(leagueId);
 
       // Save to cache
       store.setTeamsByLeague(leagueId, data);
@@ -294,7 +291,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await searchTeams(query);
+      const data = await searchTeamsClient(query);
 
       // Save to cache
       store.setSearchedTeams(query, data);
@@ -311,7 +308,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getTeamRecentMatches(teamId, limit);
+      const data = await getTeamRecentMatchesClient(teamId, limit);
 
       // Save to cache
       store.setTeamRecentMatches(teamId, limit, data);
@@ -328,7 +325,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getTeamUpcomingMatches(teamId, limit);
+      const data = await getTeamUpcomingMatchesClient(teamId, limit);
 
       // Save to cache
       store.setTeamUpcomingMatches(teamId, limit, data);
@@ -349,7 +346,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getTopScorers(leagueId, season);
+      const data = await getTopScorersClient(leagueId, season);
 
       // Save to cache
       store.setTopScorers(leagueId, season, data);
@@ -366,7 +363,7 @@ export function useFootballDataPresenter() {
       if (cached) return cached;
 
       // Fetch from API
-      const data = await getHeadToHead(team1Id, team2Id);
+      const data = await getHeadToHeadClient(team1Id, team2Id);
 
       // Save to cache
       store.setHeadToHead(team1Id, team2Id, data);

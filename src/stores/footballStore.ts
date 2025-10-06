@@ -4,17 +4,23 @@
  * Helps reduce API rate limit (10 requests/minute)
  */
 
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import localforage from "localforage";
 import type {
+  HeadToHead,
   League,
   Match,
   Standing,
   Team,
   TopScorer,
-  HeadToHead,
 } from "@/src/domain/entities/football.entity";
+import localforage from "localforage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+// Initialize localforage instance
+localforage.config({
+  name: "soc-tact",
+  storeName: "football",
+});
 
 // Cache duration in milliseconds
 const CACHE_DURATION = {
@@ -68,12 +74,15 @@ interface FootballStoreState {
   headToHead: Record<string, CacheEntry<HeadToHead>>; // key: team1Id-team2Id
 
   // League Overview
-  leagueOverview: Record<string, CacheEntry<{
-    league: League;
-    standings: Standing[];
-    recentMatches: Match[];
-    topScorers: TopScorer[];
-  }>>; // key: leagueId-season
+  leagueOverview: Record<
+    string,
+    CacheEntry<{
+      league: League;
+      standings: Standing[];
+      recentMatches: Match[];
+      topScorers: TopScorer[];
+    }>
+  >; // key: leagueId-season
 
   // Actions
   setLeagues: (data: League[]) => void;
@@ -82,29 +91,53 @@ interface FootballStoreState {
 
   setLiveMatches: (data: Match[]) => void;
   setMatchesByDate: (date: string, data: Match[]) => void;
-  setMatchesByLeague: (leagueId: number, season: number | undefined, data: Match[]) => void;
+  setMatchesByLeague: (
+    leagueId: number,
+    season: number | undefined,
+    data: Match[]
+  ) => void;
   setMatchById: (id: number, data: Match) => void;
   setUpcomingMatches: (leagueId: number | undefined, data: Match[]) => void;
   setFinishedMatches: (leagueId: number | undefined, data: Match[]) => void;
-  setFeaturedMatches: (data: { live: Match[]; today: Match[]; upcoming: Match[] }) => void;
+  setFeaturedMatches: (data: {
+    live: Match[];
+    today: Match[];
+    upcoming: Match[];
+  }) => void;
 
-  setStandingsByLeague: (leagueId: number, season: number | undefined, data: Standing[]) => void;
+  setStandingsByLeague: (
+    leagueId: number,
+    season: number | undefined,
+    data: Standing[]
+  ) => void;
 
   setTeamById: (id: number, data: Team) => void;
   setTeamsByLeague: (leagueId: number, data: Team[]) => void;
   setSearchedTeams: (query: string, data: Team[]) => void;
   setTeamRecentMatches: (teamId: number, limit: number, data: Match[]) => void;
-  setTeamUpcomingMatches: (teamId: number, limit: number, data: Match[]) => void;
+  setTeamUpcomingMatches: (
+    teamId: number,
+    limit: number,
+    data: Match[]
+  ) => void;
 
-  setTopScorers: (leagueId: number, season: number | undefined, data: TopScorer[]) => void;
+  setTopScorers: (
+    leagueId: number,
+    season: number | undefined,
+    data: TopScorer[]
+  ) => void;
   setHeadToHead: (team1Id: number, team2Id: number, data: HeadToHead) => void;
 
-  setLeagueOverview: (leagueId: number, season: number | undefined, data: {
-    league: League;
-    standings: Standing[];
-    recentMatches: Match[];
-    topScorers: TopScorer[];
-  }) => void;
+  setLeagueOverview: (
+    leagueId: number,
+    season: number | undefined,
+    data: {
+      league: League;
+      standings: Standing[];
+      recentMatches: Match[];
+      topScorers: TopScorer[];
+    }
+  ) => void;
 
   // Getters with cache validation
   getLeagues: () => League[] | null;
@@ -117,9 +150,16 @@ interface FootballStoreState {
   getMatchById: (id: number) => Match | null;
   getUpcomingMatches: (leagueId?: number) => Match[] | null;
   getFinishedMatches: (leagueId?: number) => Match[] | null;
-  getFeaturedMatches: () => { live: Match[]; today: Match[]; upcoming: Match[] } | null;
+  getFeaturedMatches: () => {
+    live: Match[];
+    today: Match[];
+    upcoming: Match[];
+  } | null;
 
-  getStandingsByLeague: (leagueId: number, season?: number) => Standing[] | null;
+  getStandingsByLeague: (
+    leagueId: number,
+    season?: number
+  ) => Standing[] | null;
 
   getTeamById: (id: number) => Team | null;
   getTeamsByLeague: (leagueId: number) => Team[] | null;
@@ -130,7 +170,10 @@ interface FootballStoreState {
   getTopScorers: (leagueId: number, season?: number) => TopScorer[] | null;
   getHeadToHead: (team1Id: number, team2Id: number) => HeadToHead | null;
 
-  getLeagueOverview: (leagueId: number, season?: number) => {
+  getLeagueOverview: (
+    leagueId: number,
+    season?: number
+  ) => {
     league: League;
     standings: Standing[];
     recentMatches: Match[];
@@ -182,7 +225,7 @@ export const useFootballStore = create<FootballStoreState>()(
 
       // Setters
       setLeagues: (data) => set({ leagues: createCacheEntry(data) }),
-      
+
       setLeagueById: (id, data) =>
         set((state) => ({
           leagueById: { ...state.leagueById, [id]: createCacheEntry(data) },
@@ -334,7 +377,10 @@ export const useFootballStore = create<FootballStoreState>()(
 
       getLiveMatches: () => {
         const cache = get().liveMatches;
-        if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.LIVE_MATCHES)) {
+        if (
+          cache &&
+          isCacheValid(cache.lastUpdate, CACHE_DURATION.LIVE_MATCHES)
+        ) {
           return cache.data;
         }
         return null;
@@ -349,7 +395,8 @@ export const useFootballStore = create<FootballStoreState>()(
       },
 
       getMatchesByLeague: (leagueId, season) => {
-        const cache = get().matchesByLeague[`${leagueId}-${season || "current"}`];
+        const cache =
+          get().matchesByLeague[`${leagueId}-${season || "current"}`];
         if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.MATCHES)) {
           return cache.data;
         }
@@ -382,14 +429,18 @@ export const useFootballStore = create<FootballStoreState>()(
 
       getFeaturedMatches: () => {
         const cache = get().featuredMatches;
-        if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.LIVE_MATCHES)) {
+        if (
+          cache &&
+          isCacheValid(cache.lastUpdate, CACHE_DURATION.LIVE_MATCHES)
+        ) {
           return cache.data;
         }
         return null;
       },
 
       getStandingsByLeague: (leagueId, season) => {
-        const cache = get().standingsByLeague[`${leagueId}-${season || "current"}`];
+        const cache =
+          get().standingsByLeague[`${leagueId}-${season || "current"}`];
         if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.STANDINGS)) {
           return cache.data;
         }
@@ -438,7 +489,10 @@ export const useFootballStore = create<FootballStoreState>()(
 
       getTopScorers: (leagueId, season) => {
         const cache = get().topScorers[`${leagueId}-${season || "current"}`];
-        if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.TOP_SCORERS)) {
+        if (
+          cache &&
+          isCacheValid(cache.lastUpdate, CACHE_DURATION.TOP_SCORERS)
+        ) {
           return cache.data;
         }
         return null;
@@ -446,14 +500,18 @@ export const useFootballStore = create<FootballStoreState>()(
 
       getHeadToHead: (team1Id, team2Id) => {
         const cache = get().headToHead[`${team1Id}-${team2Id}`];
-        if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.HEAD_TO_HEAD)) {
+        if (
+          cache &&
+          isCacheValid(cache.lastUpdate, CACHE_DURATION.HEAD_TO_HEAD)
+        ) {
           return cache.data;
         }
         return null;
       },
 
       getLeagueOverview: (leagueId, season) => {
-        const cache = get().leagueOverview[`${leagueId}-${season || "current"}`];
+        const cache =
+          get().leagueOverview[`${leagueId}-${season || "current"}`];
         if (cache && isCacheValid(cache.lastUpdate, CACHE_DURATION.STANDINGS)) {
           return cache.data;
         }
@@ -488,12 +546,21 @@ export const useFootballStore = create<FootballStoreState>()(
         const state = get();
 
         // Clear expired leagues
-        if (state.leagues && !isCacheValid(state.leagues.lastUpdate, CACHE_DURATION.LEAGUES)) {
+        if (
+          state.leagues &&
+          !isCacheValid(state.leagues.lastUpdate, CACHE_DURATION.LEAGUES)
+        ) {
           set({ leagues: null });
         }
 
         // Clear expired live matches
-        if (state.liveMatches && !isCacheValid(state.liveMatches.lastUpdate, CACHE_DURATION.LIVE_MATCHES)) {
+        if (
+          state.liveMatches &&
+          !isCacheValid(
+            state.liveMatches.lastUpdate,
+            CACHE_DURATION.LIVE_MATCHES
+          )
+        ) {
           set({ liveMatches: null });
         }
 
