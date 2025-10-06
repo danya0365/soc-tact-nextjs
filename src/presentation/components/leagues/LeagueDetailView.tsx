@@ -224,7 +224,10 @@ export function LeagueDetailView({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-3">
+                      <Link
+                        href={`/teams/${standing.team.id}`}
+                        className="flex items-center space-x-3 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                      >
                         <span className="text-2xl">{standing.team.logo}</span>
                         <div>
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -234,7 +237,7 @@ export function LeagueDetailView({
                             {standing.team.shortName}
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-100">
                       {standing.played}
