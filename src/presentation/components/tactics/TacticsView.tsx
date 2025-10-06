@@ -95,13 +95,23 @@ export function TacticsView({ initialViewModel }: TacticsViewProps) {
     <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            วิเคราะห์แทคติคฟุตบอล
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            อ่านบทวิเคราะห์แทคติคจากนักวิเคราะห์มืออาชีพ
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              วิเคราะห์แทคติคฟุตบอล
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              อ่านบทวิเคราะห์แทคติคจากนักวิเคราะห์มืออาชีพ
+            </p>
+          </div>
+          <Link
+            href="/tactics/create"
+            className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <span>✍️</span>
+            <span className="hidden sm:inline">เขียนบทวิเคราะห์</span>
+            <span className="sm:hidden">เขียน</span>
+          </Link>
         </div>
 
         {/* Stats Cards */}
