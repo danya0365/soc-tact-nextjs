@@ -1,6 +1,8 @@
 "use client";
 
 import type { SquadSelectionViewModel } from "@/src/presentation/presenters/fantasy/SquadSelectionPresenter";
+import type { FantasyPlayer } from "@/src/data/mock/fantasy/players.mock";
+import PlayerDetailModal from "@/src/presentation/components/fantasy/PlayerDetailModal";
 import {
   ChevronDown,
   ChevronUp,
@@ -31,6 +33,7 @@ export default function SquadSelectionView({
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedTeamFilter, setSelectedTeamFilter] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 15]);
+  const [selectedPlayer, setSelectedPlayer] = useState<FantasyPlayer | null>(null);
 
   // Get players for selected position
   const getPlayersForPosition = () => {
@@ -247,7 +250,11 @@ export default function SquadSelectionView({
                   </div>
                 ) : (
                   filteredPlayers.map((player) => (
-                    <PlayerRow key={player.id} player={player} />
+                    <PlayerRow 
+                      key={player.id} 
+                      player={player}
+                      onClick={() => setSelectedPlayer(player)}
+                    />
                   ))
                 )}
               </div>
@@ -337,14 +344,31 @@ export default function SquadSelectionView({
           </div>
         </div>
       </div>
+
+      {/* Player Detail Modal */}
+      {selectedPlayer && (
+        <PlayerDetailModal
+          player={selectedPlayer}
+          isOpen={!!selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+          onAddToSquad={() => {
+            // TODO: Add player to squad logic
+            console.log('Add player to squad:', selectedPlayer.name);
+            setSelectedPlayer(null);
+          }}
+        />
+      )}
     </div>
   );
 }
 
 // Player Row Component
-function PlayerRow({ player }: { player: any }) {
+function PlayerRow({ player, onClick }: { player: FantasyPlayer; onClick: () => void }) {
   return (
-    <div className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer">
+    <div 
+      onClick={onClick}
+      className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           {/* Player Avatar */}

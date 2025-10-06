@@ -1,6 +1,8 @@
 "use client";
 
 import type { FixturesViewModel } from "@/src/presentation/presenters/fantasy/FixturesPresenter";
+import type { FantasyPlayer } from "@/src/data/mock/fantasy/players.mock";
+import PlayerDetailModal from "@/src/presentation/components/fantasy/PlayerDetailModal";
 import { Calendar, Search, TrendingUp } from "lucide-react";
 import { useState } from "react";
 
@@ -16,6 +18,7 @@ export default function FixturesView({ viewModel }: FixturesViewProps) {
   const [selectedTab, setSelectedTab] = useState<"fixtures" | "players">(
     "fixtures"
   );
+  const [selectedPlayer, setSelectedPlayer] = useState<FantasyPlayer | null>(null);
 
   // Filter players
   const filteredPlayers = topPlayers.byPoints.filter(
@@ -228,7 +231,8 @@ export default function FixturesView({ viewModel }: FixturesViewProps) {
                       {filteredPlayers.map((player) => (
                         <tr
                           key={player.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                          onClick={() => setSelectedPlayer(player)}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
@@ -337,6 +341,19 @@ export default function FixturesView({ viewModel }: FixturesViewProps) {
           </div>
         )}
       </div>
+
+      {/* Player Detail Modal */}
+      {selectedPlayer && (
+        <PlayerDetailModal
+          player={selectedPlayer}
+          isOpen={!!selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+          onAddToSquad={() => {
+            console.log('Add player to squad:', selectedPlayer.name);
+            setSelectedPlayer(null);
+          }}
+        />
+      )}
     </div>
   );
 }
