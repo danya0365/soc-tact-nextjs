@@ -275,6 +275,15 @@ export default function FantasyDashboardView({
                   </span>
                   <ArrowRight className="w-5 h-5 text-green-600" />
                 </Link>
+                <Link
+                  href="/fantasy/rules"
+                  className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+                >
+                  <span className="text-orange-900 dark:text-orange-200 font-medium">
+                    กฎและวิธีเล่น
+                  </span>
+                  <ArrowRight className="w-5 h-5 text-orange-600" />
+                </Link>
               </div>
             </div>
 
