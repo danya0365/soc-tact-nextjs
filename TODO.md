@@ -36,18 +36,49 @@
 - [ ] Implement Dark Mode
 - [ ] Create responsive breakpoints
 
-### 1.3 Database & Backend
-- [ ] Choose database (Supabase/PostgreSQL recommended)
+### 1.3 Database & Backend ✅ IN PROGRESS
+- [x] Choose database (Supabase/PostgreSQL) ✅
+- [x] Initialize Supabase project ✅
 - [ ] Design database schema
-  - [ ] Users & Profiles
-  - [ ] Posts & Comments
-  - [ ] Tactics Analysis
-  - [ ] Leagues & Teams
-  - [ ] Matches & Scores
-  - [ ] Reactions & Votes
-- [ ] Setup authentication (Supabase Auth/JWT)
+  - [x] **Authentication & Profiles** (Multiple Profiles Architecture) ✅
+    - [x] `auth.users` - Authentication table (1 user = 1 auth account)
+    - [x] `public.profiles` - User profiles (1 user can have multiple profiles)
+      - Each user can create multiple profiles (e.g., personal, gaming, tech)
+      - Only 1 profile can be active at a time (`is_active` flag)
+      - All app data connects to `profiles.id`, NOT `auth.id` directly
+    - [x] `public.profile_roles` - Role management per profile (user, moderator, admin)
+    - [x] Profile management functions (set_profile_active, get_active_profile, get_user_profiles)
+  - [ ] **Tactical Posts & Content**
+    - [ ] `posts` - Tactical analysis posts
+    - [ ] `post_tags` - Tags for posts
+    - [ ] `post_formations` - Formation data
+    - [ ] `post_media` - Images/videos attached to posts
+  - [ ] **Social Features**
+    - [ ] `comments` - Comments on posts (nested replies support)
+    - [ ] `reactions` - Upvotes/downvotes on posts and comments
+    - [ ] `follows` - User following system
+    - [ ] `bookmarks` - Saved posts
+  - [ ] **Match Data** (from API or cached)
+    - [ ] `matches` - Match information cache
+    - [ ] `match_events` - Match timeline/events
+    - [ ] `match_statistics` - Match stats cache
+  - [ ] **League & Team Data** (from API or cached)
+    - [ ] `leagues` - League information
+    - [ ] `teams` - Team information
+    - [ ] `standings` - League table cache
+  - [ ] **Notifications**
+    - [ ] `notifications` - User notifications
+- [x] Setup authentication (Supabase Auth) ✅
 - [ ] Create API endpoints structure
-- [ ] Setup real-time subscriptions for live scores
+  - [ ] Posts CRUD
+  - [ ] Comments CRUD
+  - [ ] Reactions CRUD
+  - [ ] User profile management
+  - [ ] Search & discovery
+- [ ] Setup real-time subscriptions
+  - [ ] Live scores updates
+  - [ ] New comments notifications
+  - [ ] Real-time reactions
 
 ---
 
@@ -474,25 +505,209 @@ Since UI is 100% complete, you have 3 options:
 
 ---
 
-## 🔌 Phase 3: API Integration & Real Data
+## 🔌 Phase 3: Backend Integration & Real Data
 
-### 3.1 Connect Real Football API
-- [ ] Replace mock data with real API calls
+### 3.0 Database Schema Implementation (PRIORITY)
+**Architecture: Multiple Profiles per User**
+- 1 `auth.users` account can have multiple `profiles`
+- Only 1 profile is `is_active = true` at a time
+- All app data (posts, comments, follows) connects to `profiles.id`, NOT `auth.id`
+
+#### 3.0.1 Core Tables (Foundation)
+- [ ] **Profiles System** ✅ DONE
+  - [x] `auth.users` - Supabase authentication
+  - [x] `public.profiles` - User profiles with multiple profile support
+  - [x] `public.profile_roles` - Role management (user, moderator, admin)
+  - [x] Profile management RPC functions
+
+#### 3.0.2 Content Tables
+- [ ] **Posts & Tactical Analysis**
+  - [ ] `posts` table
+    ```sql
+    - id (uuid, primary key)
+    - profile_id (uuid, references profiles.id) -- NOT auth.id!
+    - title (text)
+    - content (text)
+    - formation (text) -- e.g., "4-3-3", "4-4-2"
+    - match_id (uuid, nullable) -- link to match if analyzing specific match
+    - team_id (uuid, nullable) -- link to team if analyzing team tactics
+    - thumbnail_url (text)
+    - view_count (integer)
+    - upvote_count (integer)
+    - comment_count (integer)
+    - is_published (boolean)
+    - published_at (timestamp)
+    - created_at, updated_at
+    ```
+  - [ ] `post_tags` table (many-to-many)
+    ```sql
+    - id (uuid)
+    - post_id (uuid, references posts.id)
+    - tag (text) -- e.g., "pressing", "counter-attack"
+    ```
+  - [ ] `post_media` table (images/videos)
+    ```sql
+    - id (uuid)
+    - post_id (uuid, references posts.id)
+    - media_type (text) -- "image" or "video"
+    - media_url (text)
+    - caption (text)
+    - sort_order (integer)
+    ```
+
+#### 3.0.3 Social Features Tables
+- [ ] **Comments System**
+  - [ ] `comments` table (nested replies support)
+    ```sql
+    - id (uuid)
+    - post_id (uuid, references posts.id)
+    - profile_id (uuid, references profiles.id) -- NOT auth.id!
+    - parent_comment_id (uuid, nullable) -- for nested replies
+    - content (text)
+    - upvote_count (integer)
+    - created_at, updated_at
+    ```
+
+- [ ] **Reactions System**
+  - [ ] `post_reactions` table
+    ```sql
+    - id (uuid)
+    - post_id (uuid, references posts.id)
+    - profile_id (uuid, references profiles.id) -- NOT auth.id!
+    - reaction_type (text) -- "upvote" or "downvote"
+    - created_at
+    - UNIQUE(post_id, profile_id)
+    ```
+  - [ ] `comment_reactions` table
+    ```sql
+    - id (uuid)
+    - comment_id (uuid, references comments.id)
+    - profile_id (uuid, references profiles.id) -- NOT auth.id!
+    - reaction_type (text)
+    - created_at
+    - UNIQUE(comment_id, profile_id)
+    ```
+
+- [ ] **Follow System**
+  - [ ] `follows` table
+    ```sql
+    - id (uuid)
+    - follower_profile_id (uuid, references profiles.id)
+    - following_profile_id (uuid, references profiles.id)
+    - created_at
+    - UNIQUE(follower_profile_id, following_profile_id)
+    ```
+
+- [ ] **Bookmarks**
+  - [ ] `bookmarks` table
+    ```sql
+    - id (uuid)
+    - profile_id (uuid, references profiles.id) -- NOT auth.id!
+    - post_id (uuid, references posts.id)
+    - created_at
+    - UNIQUE(profile_id, post_id)
+    ```
+
+#### 3.0.4 Match & League Data (Cache from API)
+- [ ] **Match Data Cache**
+  - [ ] `matches` table
+    ```sql
+    - id (uuid)
+    - api_match_id (text, unique) -- ID from football API
+    - home_team_id (uuid)
+    - away_team_id (uuid)
+    - home_score (integer)
+    - away_score (integer)
+    - status (text) -- "live", "finished", "upcoming"
+    - match_date (timestamp)
+    - league_id (uuid)
+    - cached_at (timestamp)
+    ```
+  - [ ] `match_statistics` table
+  - [ ] `match_events` table (goals, cards, substitutions)
+
+- [ ] **League & Team Data Cache**
+  - [ ] `leagues` table
+  - [ ] `teams` table
+  - [ ] `standings` table
+
+#### 3.0.5 Notifications
+- [ ] `notifications` table
+  ```sql
+  - id (uuid)
+  - profile_id (uuid, references profiles.id) -- NOT auth.id!
+  - type (text) -- "comment", "upvote", "follow", "mention"
+  - content (text)
+  - related_post_id (uuid, nullable)
+  - related_comment_id (uuid, nullable)
+  - related_profile_id (uuid, nullable)
+  - is_read (boolean)
+  - created_at
+  ```
+
+### 3.1 Row Level Security (RLS) Policies
+- [ ] **Profiles RLS**
+  - [ ] Users can view all profiles
+  - [ ] Users can only update their own profiles
+  - [ ] Users can only delete their own profiles
+  
+- [ ] **Posts RLS**
+  - [ ] Anyone can view published posts
+  - [ ] Users can only create posts with their active profile_id
+  - [ ] Users can only update/delete their own posts
+  
+- [ ] **Comments RLS**
+  - [ ] Anyone can view comments
+  - [ ] Users can only create comments with their active profile_id
+  - [ ] Users can only update/delete their own comments
+  
+- [ ] **Reactions RLS**
+  - [ ] Users can only create reactions with their active profile_id
+  - [ ] Users can only delete their own reactions
+  
+- [ ] **Follows RLS**
+  - [ ] Users can only create follows with their active profile_id
+  - [ ] Users can only delete their own follows
+
+### 3.2 Connect Real Football API
+- [ ] Choose API provider
+  - [ ] API-Football (RapidAPI) - Recommended
+  - [ ] Football-Data.org - Free tier
+  - [ ] TheSportsDB - Free
+- [ ] Create API service layer (`/src/infrastructure/api/football-api.ts`)
+- [ ] Implement API endpoints
+  - [ ] Get live matches
+  - [ ] Get match details
+  - [ ] Get league standings
+  - [ ] Get team information
+  - [ ] Get match statistics
+- [ ] Setup caching strategy (cache in database)
 - [ ] Setup error handling & fallbacks
-- [ ] Implement caching strategy
-- [ ] Add loading states
-- [ ] Setup real-time updates (WebSocket/polling)
+- [ ] Setup real-time updates (polling every 30s for live matches)
 
-### 3.2 Authentication Integration
-- [ ] Login page
-- [ ] Register page
-- [ ] Forgot password
-- [ ] Email verification
+### 3.3 Authentication Integration (Supabase Auth)
+- [x] Login page UI ✅
+- [x] Register page UI ✅
+- [x] Forgot password UI ✅
+- [ ] Connect Supabase Auth to login/register forms
+- [ ] Implement JWT token management
+- [ ] Setup protected routes (middleware)
+- [ ] Email verification flow
 - [ ] Social login (Google, Facebook)
-- [ ] Profile setup wizard
-  - [ ] Favorite teams
-  - [ ] Favorite leagues
-  - [ ] Preferred formations
+- [ ] Profile setup wizard (after first login)
+  - [ ] Create first profile
+  - [ ] Select favorite teams
+  - [ ] Select favorite leagues
+  - [ ] Select preferred formations
+
+### 3.4 Replace Mock Data with Real Data
+- [ ] **Posts Feed** - Connect to `posts` table
+- [ ] **Post Detail** - Connect to `posts` + `comments` tables
+- [ ] **User Profile** - Connect to `profiles` table
+- [ ] **Matches** - Connect to Football API + cache
+- [ ] **League Tables** - Connect to Football API + cache
+- [ ] **Teams** - Connect to Football API + cache
+- [ ] **Search** - Implement full-text search on posts
 
 ---
 
@@ -944,6 +1159,152 @@ Since UI is 100% complete, you have 3 options:
 
 ---
 
+---
+
+## 🎯 **RECOMMENDED NEXT STEPS** (Updated 2025-10-06)
+
+### ✅ **Current Status:**
+- ✅ UI Development: **100% Complete** (16 pages + Global Layout)
+- ✅ Supabase Project: **Initialized**
+- ✅ Authentication & Profiles: **Schema Ready** (Multiple Profiles Architecture)
+- ⏳ Database Schema: **In Progress** (Need to create content tables)
+
+### 🔥 **Priority Tasks (Start Here):**
+
+#### **STEP 1: Complete Database Schema** (Estimated: 3-4 hours)
+Create migration file: `/supabase/migrations/20250828000002_soctact_content_tables.sql`
+
+1. **Posts & Content Tables** (1-2 hours)
+   - [ ] Create `posts` table with `profile_id` reference
+   - [ ] Create `post_tags` table
+   - [ ] Create `post_media` table
+   - [ ] Add indexes for performance
+
+2. **Social Features Tables** (1-2 hours)
+   - [ ] Create `comments` table with nested replies support
+   - [ ] Create `post_reactions` table
+   - [ ] Create `comment_reactions` table
+   - [ ] Create `follows` table
+   - [ ] Create `bookmarks` table
+   - [ ] Add indexes and unique constraints
+
+3. **Notifications Table** (30 mins)
+   - [ ] Create `notifications` table
+   - [ ] Add indexes
+
+#### **STEP 2: Row Level Security (RLS)** (Estimated: 2-3 hours)
+Create migration file: `/supabase/migrations/20250828000003_soctact_rls_policies.sql`
+
+- [ ] Enable RLS on all tables
+- [ ] Create policies for `posts` (view, create, update, delete)
+- [ ] Create policies for `comments`
+- [ ] Create policies for `reactions`
+- [ ] Create policies for `follows`
+- [ ] Create policies for `bookmarks`
+- [ ] Create policies for `notifications`
+
+**Key RLS Rules:**
+- Users can only create content with their **active profile_id**
+- Users can only update/delete their own content
+- Anyone can view published content
+
+#### **STEP 3: Supabase Client Setup** (Estimated: 1-2 hours)
+1. **Install Supabase Client**
+   ```bash
+   yarn add @supabase/supabase-js
+   ```
+
+2. **Create Supabase Client** (`/src/infrastructure/config/supabase.ts`)
+   ```typescript
+   import { createClient } from '@supabase/supabase-js'
+   
+   export const supabase = createClient(
+     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+   )
+   ```
+
+3. **Setup Environment Variables** (`.env.local`)
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   ```
+
+#### **STEP 4: Authentication Integration** (Estimated: 2-3 hours)
+1. **Connect Login/Register Forms** to Supabase Auth
+   - Update `/src/presentation/presenters/auth/AuthPresenter.ts`
+   - Implement `signIn()`, `signUp()`, `signOut()` methods
+   - Handle JWT tokens
+
+2. **Create Profile After Registration**
+   - Auto-create first profile after user signs up
+   - Set as active profile
+
+3. **Setup Protected Routes** (middleware)
+   - Check authentication status
+   - Redirect to login if not authenticated
+
+#### **STEP 5: Replace Mock Data (Start Small)** (Estimated: 4-6 hours)
+1. **Posts Feed** (2-3 hours)
+   - Create repository: `/src/infrastructure/repositories/PostRepository.ts`
+   - Create use cases: `GetPostsUseCase`, `CreatePostUseCase`
+   - Update `TacticsPresenter` to use real data
+   - Test CRUD operations
+
+2. **User Profile** (1-2 hours)
+   - Create repository: `/src/infrastructure/repositories/ProfileRepository.ts`
+   - Update profile pages to use real data
+   - Implement profile switching (multiple profiles)
+
+3. **Comments** (1-2 hours)
+   - Create repository: `/src/infrastructure/repositories/CommentRepository.ts`
+   - Update post detail page to use real comments
+   - Implement nested replies
+
+---
+
+### 📋 **Development Workflow:**
+
+**Week 1: Database Foundation**
+- Day 1-2: Complete database schema (Steps 1-2)
+- Day 3: Setup Supabase client (Step 3)
+- Day 4-5: Authentication integration (Step 4)
+
+**Week 2: Content Integration**
+- Day 1-2: Posts CRUD with real data
+- Day 3: User profiles with real data
+- Day 4: Comments system
+- Day 5: Testing & bug fixes
+
+**Week 3: Social Features**
+- Day 1: Reactions (upvote/downvote)
+- Day 2: Follow system
+- Day 3: Bookmarks
+- Day 4: Notifications
+- Day 5: Testing & polish
+
+**Week 4: Football API Integration**
+- Day 1-2: Connect Football API
+- Day 3: Cache match data
+- Day 4: Live scores updates
+- Day 5: Testing & deployment
+
+---
+
+### 🎯 **Success Criteria:**
+- ✅ Users can register and login with Supabase Auth
+- ✅ Users can create multiple profiles and switch between them
+- ✅ Users can create, edit, delete tactical analysis posts
+- ✅ Users can comment on posts with nested replies
+- ✅ Users can upvote/downvote posts and comments
+- ✅ Users can follow other users
+- ✅ Users can bookmark posts
+- ✅ Live scores update automatically
+- ✅ League tables show real data
+
+---
+
 **Last Updated:** 2025-10-06
-**Version:** 1.0.0
-**Status:** Planning Phase
+**Version:** 1.1.0
+**Status:** Backend Integration Phase
+**Next Milestone:** Complete Database Schema & RLS Policies
