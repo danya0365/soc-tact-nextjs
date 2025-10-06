@@ -292,6 +292,15 @@ export default function FantasyDashboardView({
                   </span>
                   <ArrowRight className="w-5 h-5 text-orange-600" />
                 </Link>
+                <Link
+                  href="/fantasy/dream-team"
+                  className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+                >
+                  <span className="text-purple-900 dark:text-purple-200 font-medium">
+                    สร้างทีมอัตโนมัติ
+                  </span>
+                  <ArrowRight className="w-5 h-5 text-purple-600" />
+                </Link>
               </div>
             </div>
 
