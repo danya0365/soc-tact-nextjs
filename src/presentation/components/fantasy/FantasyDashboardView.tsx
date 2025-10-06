@@ -310,6 +310,15 @@ export default function FantasyDashboardView({
                   </span>
                   <ArrowRight className="w-5 h-5 text-yellow-600" />
                 </Link>
+                <Link
+                  href="/fantasy/head-to-head"
+                  className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                >
+                  <span className="text-red-900 dark:text-red-200 font-medium">
+                    เปรียบเทียบทีม
+                  </span>
+                  <ArrowRight className="w-5 h-5 text-red-600" />
+                </Link>
               </div>
             </div>
 
