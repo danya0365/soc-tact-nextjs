@@ -138,6 +138,117 @@ export default function TransfersView({ viewModel }: TransfersViewProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Transfer Area */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Current Squad */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  ทีมปัจจุบัน ({currentSquad.starting.length + currentSquad.bench.length} คน)
+                </h3>
+                {transferCount > 0 && (
+                  <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                    เลือกแล้ว {transferCount} คน
+                  </span>
+                )}
+              </div>
+              {transferCount === 0 && (
+                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    💡 คลิกที่นักเตะเพื่อเลือกขาย (สีแดง = เลือกแล้ว)
+                  </p>
+                </div>
+              )}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    ตัวจริง ({currentSquad.starting.length})
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {currentSquad.starting.map((player) => {
+                      const isSelected = transfersOut.includes(player.id);
+                      return (
+                        <button
+                          key={player.id}
+                          onClick={() => {
+                            if (isSelected) {
+                              setTransfersOut(transfersOut.filter(id => id !== player.id));
+                            } else {
+                              setTransfersOut([...transfersOut, player.id]);
+                            }
+                          }}
+                          className={`p-3 rounded-lg flex items-center justify-between transition-all ${
+                            isSelected
+                              ? "bg-red-100 dark:bg-red-900/40 border-2 border-red-500"
+                              : "bg-green-50 dark:bg-green-900/20 border-2 border-transparent hover:border-blue-400"
+                          }`}
+                        >
+                          <div className="text-left">
+                            <p className="font-medium text-gray-900 dark:text-white text-sm">
+                              {player.name.split(" ").pop()}
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              {player.team} • {player.position}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">
+                              £{player.price}m
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              ฟอร์ม: {player.form.toFixed(1)}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    สำรอง ({currentSquad.bench.length})
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {currentSquad.bench.map((player) => {
+                      const isSelected = transfersOut.includes(player.id);
+                      return (
+                        <button
+                          key={player.id}
+                          onClick={() => {
+                            if (isSelected) {
+                              setTransfersOut(transfersOut.filter(id => id !== player.id));
+                            } else {
+                              setTransfersOut([...transfersOut, player.id]);
+                            }
+                          }}
+                          className={`p-3 rounded-lg flex items-center justify-between transition-all ${
+                            isSelected
+                              ? "bg-red-100 dark:bg-red-900/40 border-2 border-red-500"
+                              : "bg-gray-50 dark:bg-gray-700/50 border-2 border-transparent hover:border-blue-400"
+                          }`}
+                        >
+                          <div className="text-left">
+                            <p className="font-medium text-gray-900 dark:text-white text-sm">
+                              {player.name.split(" ").pop()}
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              {player.team} • {player.position}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">
+                              £{player.price}m
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              ฟอร์ม: {player.form.toFixed(1)}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Chips */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
@@ -210,45 +321,41 @@ export default function TransfersView({ viewModel }: TransfersViewProps) {
                     ยังไม่มีการย้ายนักเตะ
                   </p>
                   <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    เลือกนักเตะจากทีมปัจจุบันเพื่อขาย
+                    คลิกเลือกนักเตะจากทีมปัจจุบันเพื่อขาย
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {transfersOut.map((playerId, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-                          <TrendingDown className="w-5 h-5 text-red-600" />
+                  {transfersOut.map((playerId, idx) => {
+                    const player = [...currentSquad.starting, ...currentSquad.bench].find(p => p.id === playerId);
+                    if (!player) return null;
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                            <TrendingDown className="w-5 h-5 text-red-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {player.name}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {player.team} • £{player.price}m
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            Player Out
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            £8.5m
-                          </p>
-                        </div>
+                        <button
+                          onClick={() => setTransfersOut(transfersOut.filter(id => id !== playerId))}
+                          className="text-red-600 hover:text-red-700 font-semibold text-sm"
+                        >
+                          ยกเลิก
+                        </button>
                       </div>
-                      <ArrowDownUp className="w-5 h-5 text-gray-400" />
-                      <div className="flex items-center gap-4">
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white text-right">
-                            Player In
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 text-right">
-                            £9.0m
-                          </p>
-                        </div>
-                        <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                          <TrendingUp className="w-5 h-5 text-green-600" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
@@ -291,8 +398,15 @@ export default function TransfersView({ viewModel }: TransfersViewProps) {
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 แนะนำให้ขาย
               </h3>
-              <div className="space-y-3">
-                {suggestedTransfers.playersToSell.map((player) => (
+              {suggestedTransfers.playersToSell.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    ทีมของคุณดูดีอยู่แล้ว! 👍
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {suggestedTransfers.playersToSell.map((player) => (
                   <div
                     key={player.id}
                     className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
@@ -310,8 +424,9 @@ export default function TransfersView({ viewModel }: TransfersViewProps) {
                       <span>£{player.price}m</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Players to Buy */}

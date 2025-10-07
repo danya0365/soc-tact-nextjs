@@ -77,12 +77,21 @@ export class TransfersPresenter {
 
     // Suggested transfers (based on form and fixtures)
     const playersToSell = starting
-      .filter((p) => p.form < 5) // Poor form
+      .filter((p) => {
+        // Consider selling if: poor form OR difficult fixtures
+        const avgFixtureDiff = p.nextFixtures.slice(0, 3).reduce((sum, f) => sum + f.difficulty, 0) / 3;
+        return p.form < 6.5 || avgFixtureDiff >= 4;
+      })
       .sort((a, b) => a.form - b.form)
       .slice(0, 3);
 
     const playersToBuy = allPlayers
-      .filter((p) => p.form > 7 && !starting.find((sp) => sp.id === p.id))
+      .filter((p) => {
+        // Consider buying if: good form AND not in squad AND easy fixtures
+        const avgFixtureDiff = p.nextFixtures.slice(0, 3).reduce((sum, f) => sum + f.difficulty, 0) / 3;
+        const notInSquad = !starting.find((sp) => sp.id === p.id) && !bench.find((bp) => bp.id === p.id);
+        return p.form > 7 && notInSquad && avgFixtureDiff <= 3;
+      })
       .sort((a, b) => b.form - a.form)
       .slice(0, 5);
 
