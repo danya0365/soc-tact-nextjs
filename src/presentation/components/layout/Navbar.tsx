@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  // Ensure UI is mounted to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navLinks = [
     { href: "/", label: "หน้าแรก", icon: "🏠" },
@@ -78,6 +86,19 @@ export function Navbar() {
               <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
             </form>
 
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {mounted ? (
+                theme === "dark" ? "🌙" : "☀️"
+              ) : (
+                <span className="w-6 h-6"></span> // Prevent layout shift
+              )}
+            </button>
+
             {/* User Menu */}
             <Link
               href="/profile/tactical-genius"
@@ -88,13 +109,29 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-          >
-            <span className="text-2xl">{isMobileMenuOpen ? "✕" : "☰"}</span>
-          </button>
+          {/* Mobile Menu Buttons */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Dark Mode Toggle (Mobile) */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {mounted ? (
+                theme === "dark" ? "🌙" : "☀️"
+              ) : (
+                <span className="w-6 h-6"></span>
+              )}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            >
+              <span className="text-2xl">{isMobileMenuOpen ? "✕" : "☰"}</span>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
