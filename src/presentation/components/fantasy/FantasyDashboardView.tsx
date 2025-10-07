@@ -319,6 +319,15 @@ export default function FantasyDashboardView({
                   </span>
                   <ArrowRight className="w-5 h-5 text-red-600" />
                 </Link>
+                <Link
+                  href="/fantasy/planner"
+                  className="flex items-center justify-between p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors"
+                >
+                  <span className="text-teal-900 dark:text-teal-200 font-medium">
+                    วางแผน Gameweek
+                  </span>
+                  <ArrowRight className="w-5 h-5 text-teal-600" />
+                </Link>
               </div>
             </div>
 
