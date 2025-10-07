@@ -328,6 +328,15 @@ export default function FantasyDashboardView({
                   </span>
                   <ArrowRight className="w-5 h-5 text-teal-600" />
                 </Link>
+                <Link
+                  href="/fantasy/watchlist"
+                  className="flex items-center justify-between p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
+                >
+                  <span className="text-pink-900 dark:text-pink-200 font-medium">
+                    Watchlist & ราคา
+                  </span>
+                  <ArrowRight className="w-5 h-5 text-pink-600" />
+                </Link>
               </div>
             </div>
 
