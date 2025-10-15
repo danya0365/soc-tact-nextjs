@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { LandingViewModel } from "@/src/presentation/presenters/landing/LandingPresenter";
 import { useLandingPresenter } from "@/src/presentation/presenters/landing/useLandingPresenter";
 import Image from "next/image";
@@ -11,6 +12,7 @@ interface LandingViewProps {
 
 export function LandingView({ initialViewModel }: LandingViewProps) {
   const [state, actions] = useLandingPresenter(initialViewModel);
+  const [showAllTeams, setShowAllTeams] = React.useState(false);
   const viewModel = state.viewModel;
 
   // Helper functions
@@ -330,26 +332,13 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
               <table className="min-w-full">
                 <thead className="bg-green-600 text-white">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      #
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      ทีม
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      แข่ง
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      ชนะ
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      เสมอ
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      แพ้
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      +/-
+                    <th className="px-4 py-3 text-left text-sm font-semibold">#</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">ทีม</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">แข่ง</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">ชนะ</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">เสมอ</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">แพ้</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">+/-
                     </th>
                     <th className="px-4 py-3 text-center text-sm font-semibold">
                       คะแนน
@@ -360,7 +349,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {viewModel.leagueStandings.map((team) => (
+                  {viewModel.leagueStandings.slice(0, showAllTeams ? viewModel.leagueStandings.length : 6).map((team) => (
                     <tr
                       key={team.position}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -424,6 +413,25 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 </tbody>
               </table>
             </div>
+            {viewModel.leagueStandings.length > 6 && (
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-right">
+                <button
+                  onClick={() => setShowAllTeams(!showAllTeams)}
+                  className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+                >
+                  {showAllTeams ? 'แสดงน้อยลง' : 'ดูทั้งหมด'}
+                  <svg 
+                    className={`ml-1 w-4 h-4 transition-transform ${showAllTeams ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
