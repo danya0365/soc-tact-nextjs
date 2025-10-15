@@ -12,7 +12,7 @@ const LEAGUE_NAME_TO_ID: Record<string, number> = {
   "Premier League": LEAGUE_IDS.PREMIER_LEAGUE,
   "La Liga": LEAGUE_IDS.LA_LIGA,
   "Serie A": LEAGUE_IDS.SERIE_A,
-  "Bundesliga": LEAGUE_IDS.BUNDESLIGA,
+  Bundesliga: LEAGUE_IDS.BUNDESLIGA,
   "Ligue 1": LEAGUE_IDS.LIGUE_1,
   "Thai Premier League": LEAGUE_IDS.PREMIER_LEAGUE, // Fallback to Premier League
 };
@@ -58,12 +58,13 @@ export function useLandingPresenter(
       setError(null);
 
       try {
-        const leagueId = LEAGUE_NAME_TO_ID[leagueName] || LEAGUE_IDS.PREMIER_LEAGUE;
+        const leagueId =
+          LEAGUE_NAME_TO_ID[leagueName] || LEAGUE_IDS.PREMIER_LEAGUE;
         const standings = await footballData.fetchStandingsByLeague(leagueId);
 
-        const mappedStandings = standings
-          .slice(0, 5)
-          .map((standing) => LandingPresenterMapper.mapToLeagueStanding(standing));
+        const mappedStandings = standings.map((standing) =>
+          LandingPresenterMapper.mapToLeagueStanding(standing)
+        );
 
         // Update only standings, keep other data
         setViewModel((prev) => {
@@ -74,7 +75,8 @@ export function useLandingPresenter(
           };
         });
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
         setError(errorMessage);
         console.error("Error loading standings:", err);
       } finally {
@@ -95,8 +97,9 @@ export function useLandingPresenter(
     try {
       // Fetch data with caching from useFootballDataPresenter
       // This will check cache first, if not found it will call API and save to cache
-      const leagueId = LEAGUE_NAME_TO_ID[selectedLeague] || LEAGUE_IDS.PREMIER_LEAGUE;
-      
+      const leagueId =
+        LEAGUE_NAME_TO_ID[selectedLeague] || LEAGUE_IDS.PREMIER_LEAGUE;
+
       const [liveMatches, standings] = await Promise.all([
         footballData.fetchLiveMatches(),
         footballData.fetchStandingsByLeague(leagueId),
@@ -108,7 +111,9 @@ export function useLandingPresenter(
 
       const mappedStandings = standings
         .slice(0, 5)
-        .map((standing) => LandingPresenterMapper.mapToLeagueStanding(standing));
+        .map((standing) =>
+          LandingPresenterMapper.mapToLeagueStanding(standing)
+        );
 
       const newViewModel = await presenter.getViewModel();
 
