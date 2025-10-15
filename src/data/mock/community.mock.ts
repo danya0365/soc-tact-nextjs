@@ -122,6 +122,21 @@ export interface Discussion {
   tags: string[];
 }
 
+export interface Comment {
+  id: string;
+  postId: string;
+  authorId: string;
+  content: string;
+  createdDate: string;
+  editedDate?: string;
+  parentId?: string; // For nested replies
+  stats: {
+    upvotes: number;
+    downvotes: number;
+  };
+  isEdited: boolean;
+}
+
 // ============= MOCK DATA =============
 
 export const MOCK_COMMUNITY_MEMBERS: CommunityMember[] = [
@@ -428,4 +443,146 @@ export function getBadgeById(id: string) {
 // Helper function to get group type details
 export function getGroupTypeById(id: string) {
   return GROUP_TYPES.find((type) => type.id === id);
+}
+
+// ============= MOCK COMMENTS =============
+
+export const MOCK_COMMENTS: Comment[] = [
+  // Comments for post-1 (Pep Guardiola's Inverted Fullback System)
+  {
+    id: "comment-1",
+    postId: "post-1",
+    authorId: "member-2",
+    content: "Great analysis! I've been watching City's games closely and this tactical shift has been revolutionary. The way Walker and Stones tuck into midfield creates so much overload.",
+    createdDate: "2025-10-15T10:45:00",
+    stats: { upvotes: 45, downvotes: 2 },
+    isEdited: false,
+  },
+  {
+    id: "comment-2",
+    postId: "post-1",
+    authorId: "member-3",
+    content: "คิดว่าการใช้แบ็คข้างเข้ามาในแนวกลางนี้ทำให้ทีมควบคุมเกมได้ดีขึ้นมากเลย แต่ก็มีข้อเสียตอนถูกคาวน์เตอร์นะ",
+    createdDate: "2025-10-15T11:20:00",
+    stats: { upvotes: 28, downvotes: 1 },
+    isEdited: false,
+  },
+  {
+    id: "comment-3",
+    postId: "post-1",
+    authorId: "member-1",
+    content: "Exactly! That's why having quick center-backs like Dias and Ake is crucial. They need to cover the wide spaces when fullbacks move inside.",
+    createdDate: "2025-10-15T11:45:00",
+    parentId: "comment-2",
+    stats: { upvotes: 34, downvotes: 0 },
+    isEdited: false,
+  },
+  {
+    id: "comment-4",
+    postId: "post-1",
+    authorId: "member-2",
+    content: "The key is also having midfielders like Rodri who can drop between the center-backs. It's a complex system that requires very intelligent players.",
+    createdDate: "2025-10-15T12:30:00",
+    parentId: "comment-3",
+    stats: { upvotes: 21, downvotes: 0 },
+    isEdited: false,
+  },
+  {
+    id: "comment-5",
+    postId: "post-1",
+    authorId: "member-3",
+    content: "Would love to see more teams try this! Arsenal attempted it last season with Zinchenko.",
+    createdDate: "2025-10-15T13:15:00",
+    stats: { upvotes: 18, downvotes: 3 },
+    isEdited: false,
+  },
+
+  // Comments for post-2 (Man Utd vs Liverpool)
+  {
+    id: "comment-6",
+    postId: "post-2",
+    authorId: "member-1",
+    content: "The midfield was completely overrun. We need a proper holding midfielder who can shield the defense.",
+    createdDate: "2025-10-15T08:30:00",
+    stats: { upvotes: 56, downvotes: 8 },
+    isEdited: false,
+  },
+  {
+    id: "comment-7",
+    postId: "post-2",
+    authorId: "member-3",
+    content: "Tactics aside, the players just didn't show up. Poor effort and desire throughout the team.",
+    createdDate: "2025-10-15T09:00:00",
+    stats: { upvotes: 42, downvotes: 12 },
+    isEdited: false,
+  },
+  {
+    id: "comment-8",
+    postId: "post-2",
+    authorId: "member-2",
+    content: "I think the manager got the formation wrong. Playing 4-2-3-1 against Liverpool's press was suicidal. Should have gone with 4-3-3 for more midfield control.",
+    createdDate: "2025-10-15T09:45:00",
+    stats: { upvotes: 67, downvotes: 5 },
+    isEdited: true,
+    editedDate: "2025-10-15T10:00:00",
+  },
+
+  // Comments for post-3 (FPL Transfer Tips)
+  {
+    id: "comment-9",
+    postId: "post-3",
+    authorId: "member-1",
+    content: "Haaland is essential, but don't sleep on Salah. Liverpool's fixtures are amazing for the next 5 GWs.",
+    createdDate: "2025-10-15T06:30:00",
+    stats: { upvotes: 89, downvotes: 3 },
+    isEdited: false,
+  },
+  {
+    id: "comment-10",
+    postId: "post-3",
+    authorId: "member-2",
+    content: "What about Saka? Arsenal are in great form and he's on penalties.",
+    createdDate: "2025-10-15T07:00:00",
+    stats: { upvotes: 52, downvotes: 1 },
+    isEdited: false,
+  },
+  {
+    id: "comment-11",
+    postId: "post-3",
+    authorId: "member-3",
+    content: "ผมว่า Haaland + Salah + Saka คือ 3 ตัวหลักที่ต้องมี ส่วนที่เหลือก็หาตัวถูกๆ มาเสริมครับ",
+    createdDate: "2025-10-15T07:30:00",
+    stats: { upvotes: 73, downvotes: 2 },
+    isEdited: false,
+  },
+  {
+    id: "comment-12",
+    postId: "post-3",
+    authorId: "member-1",
+    content: "Don't forget about Son! Spurs have some good fixtures coming up and he's in red hot form.",
+    createdDate: "2025-10-15T08:00:00",
+    parentId: "comment-11",
+    stats: { upvotes: 38, downvotes: 4 },
+    isEdited: false,
+  },
+];
+
+// Helper function to get comments by post ID
+export function getCommentsByPostId(postId: string): Comment[] {
+  return MOCK_COMMENTS.filter((comment) => comment.postId === postId);
+}
+
+// Helper function to get comment by ID
+export function getCommentById(id: string): Comment | undefined {
+  return MOCK_COMMENTS.find((comment) => comment.id === id);
+}
+
+// Helper function to get post by ID
+export function getPostById(id: string): CommunityPost | undefined {
+  return MOCK_COMMUNITY_POSTS.find((post) => post.id === id);
+}
+
+// Helper function to get replies to a comment
+export function getRepliesToComment(commentId: string): Comment[] {
+  return MOCK_COMMENTS.filter((comment) => comment.parentId === commentId);
 }

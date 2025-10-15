@@ -199,7 +199,9 @@ export function CommunityView({ initialViewModel }: CommunityViewProps) {
                       </div>
 
                       {/* Post Title */}
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{post.title}</h3>
+                      <Link href={`/community/posts/${post.id}`}>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 hover:text-green-600 transition-colors cursor-pointer">{post.title}</h3>
+                      </Link>
 
                       {/* Post Content */}
                       <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">{post.content}</p>

@@ -78,3 +78,8 @@ export const COMMUNITY_CATEGORIES: CommunityCategory[] = [
     color: "bg-red-500",
   },
 ];
+
+// Helper function to get category by ID
+export function getCategoryById(id: string): CommunityCategory | undefined {
+  return COMMUNITY_CATEGORIES.find((category) => category.id === id);
+}
