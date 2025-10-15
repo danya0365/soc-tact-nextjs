@@ -119,7 +119,8 @@ export function useLandingPresenter(
 
       // Replace API data with cached/fresh data from footballData
       setViewModel({
-        liveMatches: mappedLiveMatches,
+        ...viewModel,
+        liveMatches: viewModel?.liveMatches || mappedLiveMatches,
         leagueStandings: mappedStandings,
         featuredPosts: newViewModel.featuredPosts,
         stats: {
@@ -137,7 +138,7 @@ export function useLandingPresenter(
     } finally {
       setLoading(false);
     }
-  }, [footballData, selectedLeague]);
+  }, [footballData, selectedLeague, viewModel]);
 
   /**
    * Load data from cache or API

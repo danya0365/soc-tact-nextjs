@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
 import { LandingViewModel } from "@/src/presentation/presenters/landing/LandingPresenter";
 import { useLandingPresenter } from "@/src/presentation/presenters/landing/useLandingPresenter";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
 interface LandingViewProps {
   initialViewModel?: LandingViewModel;
@@ -219,73 +219,88 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
               </button>
             </div>
           ) : (
-            // Live Matches Grid
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {viewModel.liveMatches.map((match) => (
-                <div
-                  key={match.id}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="bg-gradient-to-r from-green-600 to-green-700 px-4 py-2 flex items-center justify-between">
-                    <span className="text-white text-sm font-medium">
-                      {match.league}
+            // Live Matches Grouped by League
+            <div className="space-y-8">
+              {viewModel.liveMatchesByLeague.map((league) => (
+                <div key={league.league} className="space-y-4">
+                  <div className="flex items-center">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                      {league.league}
+                    </h3>
+                    <span className="ml-3 px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      {league.matches.length} นัด
                     </span>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`w-2 h-2 rounded-full ${getStatusColor(
-                          match.status
-                        )}`}
-                      ></span>
-                      <span className="text-white text-sm font-bold">
-                        {match.minute}&apos;
-                      </span>
-                    </div>
                   </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {league.matches.map((match) => (
+                      <div
+                        key={match.id}
+                        className="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-md transition-shadow"
+                      >
+                        <div className="px-4 py-3 flex items-center justify-between bg-gradient-to-r from-green-600 to-green-700 rounded-t-xl">
+                          <span className="text-white text-xs font-medium">
+                            {match.league}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`w-2 h-2 rounded-full ${getStatusColor(
+                                match.status
+                              )}`}
+                            ></span>
+                            <span className="text-white text-xs font-bold">
+                              {match.status === 'live' ? `${match.minute}'` : match.status === 'finished' ? 'จบการแข่งขัน' : 'ยังไม่เริ่ม'}
+                            </span>
+                          </div>
+                        </div>
 
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3 flex-1">
-                        {match.homeLogo.startsWith("http") ? (
-                          <Image
-                            src={match.homeLogo}
-                            alt={match.homeTeam}
-                            width={32}
-                            height={32}
-                            className="object-contain"
-                          />
-                        ) : (
-                          <span className="text-3xl">{match.homeLogo}</span>
-                        )}
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">
-                          {match.homeTeam}
-                        </span>
-                      </div>
-                      <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        {match.homeScore}
-                      </span>
-                    </div>
+                        <div className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2 flex-1">
+                              {match.homeLogo.startsWith("http") ? (
+                                <Image
+                                  src={match.homeLogo}
+                                  alt={match.homeTeam}
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
+                                />
+                              ) : (
+                                <span className="text-2xl">{match.homeLogo}</span>
+                              )}
+                              <span className="font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-1">
+                                {match.homeTeam}
+                              </span>
+                            </div>
+                            <span className="text-xl font-bold text-gray-900 dark:text-gray-100 ml-2">
+                              {match.homeScore}
+                            </span>
+                          </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        {match.awayLogo.startsWith("http") ? (
-                          <Image
-                            src={match.awayLogo}
-                            alt={match.awayTeam}
-                            width={32}
-                            height={32}
-                            className="object-contain"
-                          />
-                        ) : (
-                          <span className="text-3xl">{match.awayLogo}</span>
-                        )}
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">
-                          {match.awayTeam}
-                        </span>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 flex-1">
+                              {match.awayLogo.startsWith("http") ? (
+                                <Image
+                                  src={match.awayLogo}
+                                  alt={match.awayTeam}
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
+                                />
+                              ) : (
+                                <span className="text-2xl">{match.awayLogo}</span>
+                              )}
+                              <span className="font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-1">
+                                {match.awayTeam}
+                              </span>
+                            </div>
+                            <span className="text-xl font-bold text-gray-900 dark:text-gray-100 ml-2">
+                              {match.awayScore}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        {match.awayScore}
-                      </span>
-                    </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -332,13 +347,26 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
               <table className="min-w-full">
                 <thead className="bg-green-600 text-white">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">#</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">ทีม</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">แข่ง</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">ชนะ</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">เสมอ</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">แพ้</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">+/-
+                    <th className="px-4 py-3 text-left text-sm font-semibold">
+                      #
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">
+                      ทีม
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">
+                      แข่ง
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">
+                      ชนะ
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">
+                      เสมอ
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">
+                      แพ้
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">
+                      +/-
                     </th>
                     <th className="px-4 py-3 text-center text-sm font-semibold">
                       คะแนน
@@ -349,67 +377,72 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {viewModel.leagueStandings.slice(0, showAllTeams ? viewModel.leagueStandings.length : 6).map((team) => (
-                    <tr
-                      key={team.position}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <td className="px-4 py-4 text-center font-bold text-gray-900 dark:text-gray-100">
-                        {team.position}
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          {team.logo.startsWith("http") ? (
-                            <Image
-                              src={team.logo}
-                              alt={team.team}
-                              width={24}
-                              height={24}
-                              className="object-contain"
-                            />
-                          ) : (
-                            <span className="text-2xl">{team.logo}</span>
-                          )}
-                          <span className="font-semibold text-gray-900 dark:text-gray-100">
-                            {team.team}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                        {team.played}
-                      </td>
-                      <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                        {team.won}
-                      </td>
-                      <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                        {team.drawn}
-                      </td>
-                      <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                        {team.lost}
-                      </td>
-                      <td className="px-4 py-4 text-center font-semibold text-gray-900 dark:text-gray-100">
-                        {team.goalDifference > 0 ? "+" : ""}
-                        {team.goalDifference}
-                      </td>
-                      <td className="px-4 py-4 text-center font-bold text-green-600 text-lg">
-                        {team.points}
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex gap-1 justify-center">
-                          {team.form.map((result, idx) => (
-                            <div
-                              key={idx}
-                              className={`w-6 h-6 rounded-full ${getFormColor(
-                                result
-                              )} flex items-center justify-center text-white text-xs font-bold`}
-                            >
-                              {result}
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {viewModel.leagueStandings
+                    .slice(
+                      0,
+                      showAllTeams ? viewModel.leagueStandings.length : 6
+                    )
+                    .map((team) => (
+                      <tr
+                        key={team.position}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <td className="px-4 py-4 text-center font-bold text-gray-900 dark:text-gray-100">
+                          {team.position}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-3">
+                            {team.logo.startsWith("http") ? (
+                              <Image
+                                src={team.logo}
+                                alt={team.team}
+                                width={24}
+                                height={24}
+                                className="object-contain"
+                              />
+                            ) : (
+                              <span className="text-2xl">{team.logo}</span>
+                            )}
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">
+                              {team.team}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                          {team.played}
+                        </td>
+                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                          {team.won}
+                        </td>
+                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                          {team.drawn}
+                        </td>
+                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                          {team.lost}
+                        </td>
+                        <td className="px-4 py-4 text-center font-semibold text-gray-900 dark:text-gray-100">
+                          {team.goalDifference > 0 ? "+" : ""}
+                          {team.goalDifference}
+                        </td>
+                        <td className="px-4 py-4 text-center font-bold text-green-600 text-lg">
+                          {team.points}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex gap-1 justify-center">
+                            {team.form.map((result, idx) => (
+                              <div
+                                key={idx}
+                                className={`w-6 h-6 rounded-full ${getFormColor(
+                                  result
+                                )} flex items-center justify-center text-white text-xs font-bold`}
+                              >
+                                {result}
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -419,15 +452,22 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                   onClick={() => setShowAllTeams(!showAllTeams)}
                   className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                 >
-                  {showAllTeams ? 'แสดงน้อยลง' : 'ดูทั้งหมด'}
-                  <svg 
-                    className={`ml-1 w-4 h-4 transition-transform ${showAllTeams ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24" 
+                  {showAllTeams ? "แสดงน้อยลง" : "ดูทั้งหมด"}
+                  <svg
+                    className={`ml-1 w-4 h-4 transition-transform ${
+                      showAllTeams ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
               </div>
@@ -441,15 +481,19 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
               🎯 บทวิเคราะห์แนะนำ
             </h2>
-            <button className="text-green-600 hover:text-green-700 font-medium">
+            <Link
+              href="/tactics"
+              className="text-green-600 hover:text-green-700 font-medium"
+            >
               ดูทั้งหมด →
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {viewModel.featuredPosts.map((post) => (
-              <div
+              <Link
                 key={post.id}
+                href={`/tactics/${post.id}`}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
               >
                 <div className="bg-gradient-to-br from-green-500 to-green-700 h-48 flex items-center justify-center text-8xl">
@@ -491,7 +535,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

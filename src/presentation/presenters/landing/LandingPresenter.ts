@@ -7,13 +7,7 @@
 import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
 import { mockMatches } from "@/src/data/mock/matches.mock";
 import { mockTacticalPosts } from "@/src/data/mock/tactics.mock";
-import {
-  getLiveMatches,
-  getStandingsByLeague,
-  LEAGUE_IDS,
-  type Match,
-  type Standing,
-} from "@/src/infrastructure/api";
+import { type Match, type Standing } from "@/src/infrastructure/api";
 
 // View Model interfaces for Landing Page
 export interface LiveMatch {
@@ -65,8 +59,14 @@ export interface LandingStats {
   totalLeagues: number;
 }
 
+export interface LeagueMatches {
+  league: string;
+  matches: LiveMatch[];
+}
+
 export interface LandingViewModel {
   liveMatches: LiveMatch[];
+  liveMatchesByLeague: LeagueMatches[];
   leagueStandings: LeagueStanding[];
   featuredPosts: TacticalPost[];
   stats: LandingStats;
@@ -114,6 +114,25 @@ export class LandingPresenterMapper {
       form: standing.form || [],
     };
   }
+
+  // Group matches by league
+  static groupMatchesByLeague(matches: LiveMatch[]): LeagueMatches[] {
+    const leagueMap = new Map<string, LiveMatch[]>();
+
+    // Group matches by league
+    matches.forEach((match) => {
+      if (!leagueMap.has(match.league)) {
+        leagueMap.set(match.league, []);
+      }
+      leagueMap.get(match.league)?.push(match);
+    });
+
+    // Convert map to array of LeagueMatches
+    return Array.from(leagueMap.entries()).map(([league, matches]) => ({
+      league,
+      matches,
+    }));
+  }
 }
 
 /**
@@ -121,12 +140,24 @@ export class LandingPresenterMapper {
  * Integrates with Football API for real data
  */
 export class LandingPresenter {
+  // Get stats
+  private async getStats(): Promise<LandingStats> {
+    // In a real app, this would fetch from your API
+    return {
+      totalPosts: 0,
+      totalUsers: 0,
+      totalMatches: 0,
+      totalLeagues: 0,
+    };
+  }
+
   /**
    * Get fallback data when API fails
    */
   private getFallbackData(): LandingViewModel {
     return {
       liveMatches: [],
+      liveMatchesByLeague: [],
       leagueStandings: [],
       featuredPosts: [
         {
@@ -159,41 +190,6 @@ export class LandingPresenter {
     };
   }
 
-  private async getApiData() {
-    // Fetch real data from Football API
-    const [liveMatchesData, standingsData] = await Promise.all([
-      getLiveMatches().catch(() => [] as Match[]),
-      getStandingsByLeague(LEAGUE_IDS.PREMIER_LEAGUE).catch(
-        () => [] as Standing[]
-      ),
-    ]);
-
-    // Map to view models
-    const liveMatches = liveMatchesData
-      .slice(0, 3)
-      .map((match) => LandingPresenterMapper.mapToLiveMatch(match));
-
-    const leagueStandings = standingsData
-      .slice(0, 5)
-      .map((standing) => LandingPresenterMapper.mapToLeagueStanding(standing));
-
-    return {
-      liveMatches,
-      leagueStandings,
-    };
-  }
-
-  private async getPopularLeagues() {
-    return [
-      "Premier League",
-      "La Liga",
-      "Serie A",
-      "Bundesliga",
-      "Ligue 1",
-      "Thai Premier League",
-    ];
-  }
-
   /**
    * Get view model with real API data
    */
@@ -223,9 +219,6 @@ export class LandingPresenter {
         totalMatches: 156,
         totalLeagues: 12,
       };
-
-      // Popular leagues
-      const popularLeagues = await this.getPopularLeagues();
 
       // Use mock data for landing page
       const liveMatches = mockMatches
@@ -263,10 +256,12 @@ export class LandingPresenter {
 
       return {
         liveMatches,
+        liveMatchesByLeague:
+          LandingPresenterMapper.groupMatchesByLeague(liveMatches),
         leagueStandings,
         featuredPosts,
         stats,
-        popularLeagues,
+        popularLeagues: [],
       };
     } catch (error) {
       console.error("Error fetching landing data:", error);
