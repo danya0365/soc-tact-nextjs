@@ -7,28 +7,18 @@ import {
   LandingViewModel,
 } from "./LandingPresenter";
 
-// Mapping league names to league IDs
-const LEAGUE_NAME_TO_ID: Record<string, number> = {
-  "Premier League": LEAGUE_IDS.PREMIER_LEAGUE,
-  "La Liga": LEAGUE_IDS.LA_LIGA,
-  "Serie A": LEAGUE_IDS.SERIE_A,
-  Bundesliga: LEAGUE_IDS.BUNDESLIGA,
-  "Ligue 1": LEAGUE_IDS.LIGUE_1,
-  "Thai Premier League": LEAGUE_IDS.PREMIER_LEAGUE, // Fallback to Premier League
-};
-
 const presenter = LandingPresenterFactory.createClient();
 
 export interface LandingPresenterState {
   viewModel: LandingViewModel | null;
   loading: boolean;
   error: string | null;
-  selectedLeague: string;
+  selectedLeague: number;
 }
 
 export interface LandingPresenterActions {
   refreshData: () => Promise<void>;
-  setSelectedLeague: (league: string) => void;
+  setSelectedLeague: (league: number) => void;
   setError: (error: string | null) => void;
 }
 
@@ -44,7 +34,9 @@ export function useLandingPresenter(
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLeague, setSelectedLeague] = useState("Premier League");
+  const [selectedLeague, setSelectedLeague] = useState(
+    LEAGUE_IDS.PREMIER_LEAGUE
+  );
 
   // Get football data presenter for caching
   const footballData = useFootballDataPresenter();
@@ -53,13 +45,11 @@ export function useLandingPresenter(
    * Load standings for selected league
    */
   const loadStandingsByLeague = useCallback(
-    async (leagueName: string) => {
+    async (leagueId: number) => {
       setLoading(true);
       setError(null);
 
       try {
-        const leagueId =
-          LEAGUE_NAME_TO_ID[leagueName] || LEAGUE_IDS.PREMIER_LEAGUE;
         const standings = await footballData.fetchStandingsByLeague(leagueId);
 
         const mappedStandings = standings.map((standing) =>
@@ -97,23 +87,20 @@ export function useLandingPresenter(
     try {
       // Fetch data with caching from useFootballDataPresenter
       // This will check cache first, if not found it will call API and save to cache
-      const leagueId =
-        LEAGUE_NAME_TO_ID[selectedLeague] || LEAGUE_IDS.PREMIER_LEAGUE;
+      const leagueId = selectedLeague;
 
       const [liveMatches, standings] = await Promise.all([
         footballData.fetchLiveMatches(),
         footballData.fetchStandingsByLeague(leagueId),
       ]);
 
-      const mappedLiveMatches = liveMatches
-        .slice(0, 3)
-        .map((match) => LandingPresenterMapper.mapToLiveMatch(match));
+      const mappedLiveMatches = liveMatches.map((match) =>
+        LandingPresenterMapper.mapToLiveMatch(match)
+      );
 
-      const mappedStandings = standings
-        .slice(0, 5)
-        .map((standing) =>
-          LandingPresenterMapper.mapToLeagueStanding(standing)
-        );
+      const mappedStandings = standings.map((standing) =>
+        LandingPresenterMapper.mapToLeagueStanding(standing)
+      );
 
       const newViewModel = await presenter.getViewModel();
 
@@ -121,6 +108,7 @@ export function useLandingPresenter(
       setViewModel({
         ...viewModel,
         liveMatches: viewModel?.liveMatches || mappedLiveMatches,
+        liveMatchesByLeague: viewModel?.liveMatchesByLeague || [],
         leagueStandings: mappedStandings,
         featuredPosts: newViewModel.featuredPosts,
         stats: {
@@ -149,10 +137,10 @@ export function useLandingPresenter(
   }, [loadData]);
 
   const handleSetSelectedLeague = useCallback(
-    (league: string) => {
-      setSelectedLeague(league);
+    (leagueId: number) => {
+      setSelectedLeague(leagueId);
       // Load standings for the newly selected league
-      loadStandingsByLeague(league);
+      loadStandingsByLeague(leagueId);
     },
     [loadStandingsByLeague]
   );

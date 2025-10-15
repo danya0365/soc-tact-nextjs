@@ -7,7 +7,11 @@
 import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
 import { mockMatches } from "@/src/data/mock/matches.mock";
 import { mockTacticalPosts } from "@/src/data/mock/tactics.mock";
-import { type Match, type Standing } from "@/src/infrastructure/api";
+import {
+  LEAGUE_IDS,
+  type Match,
+  type Standing,
+} from "@/src/infrastructure/api";
 
 // View Model interfaces for Landing Page
 export interface LiveMatch {
@@ -64,13 +68,18 @@ export interface LeagueMatches {
   matches: LiveMatch[];
 }
 
+export interface PopularLeague {
+  id: number;
+  name: string;
+}
+
 export interface LandingViewModel {
   liveMatches: LiveMatch[];
   liveMatchesByLeague: LeagueMatches[];
   leagueStandings: LeagueStanding[];
   featuredPosts: TacticalPost[];
   stats: LandingStats;
-  popularLeagues: string[];
+  popularLeagues: PopularLeague[];
 }
 
 export class LandingPresenterMapper {
@@ -140,15 +149,14 @@ export class LandingPresenterMapper {
  * Integrates with Football API for real data
  */
 export class LandingPresenter {
-  // Get stats
-  private async getStats(): Promise<LandingStats> {
-    // In a real app, this would fetch from your API
-    return {
-      totalPosts: 0,
-      totalUsers: 0,
-      totalMatches: 0,
-      totalLeagues: 0,
-    };
+  private async getPopularLeagues(): Promise<PopularLeague[]> {
+    return [
+      { id: LEAGUE_IDS.PREMIER_LEAGUE, name: "Premier League" },
+      { id: LEAGUE_IDS.LA_LIGA, name: "La Liga" },
+      { id: LEAGUE_IDS.SERIE_A, name: "Serie A" },
+      { id: LEAGUE_IDS.BUNDESLIGA, name: "Bundesliga" },
+      { id: LEAGUE_IDS.LIGUE_1, name: "Ligue 1" },
+    ];
   }
 
   /**
@@ -180,13 +188,7 @@ export class LandingPresenter {
         totalMatches: 0,
         totalLeagues: 12,
       },
-      popularLeagues: [
-        "Premier League",
-        "La Liga",
-        "Serie A",
-        "Bundesliga",
-        "Ligue 1",
-      ],
+      popularLeagues: [],
     };
   }
 
@@ -223,7 +225,6 @@ export class LandingPresenter {
       // Use mock data for landing page
       const liveMatches = mockMatches
         .filter((m) => m.status === "live" || m.status === "upcoming")
-        .slice(0, 4)
         .map((match) => ({
           id: match.id,
           homeTeam: match.homeTeam.name,
@@ -237,31 +238,31 @@ export class LandingPresenter {
           awayLogo: "⚽",
         }));
 
-      const leagueStandings = mockPremierLeagueStandings
-        .slice(0, 5)
-        .map((s) => ({
-          position: s.position,
-          team: s.team.name,
-          logo: s.team.logo,
-          played: s.played,
-          won: s.won,
-          drawn: s.drawn,
-          lost: s.lost,
-          goalsFor: s.goalsFor,
-          goalsAgainst: s.goalsAgainst,
-          goalDifference: s.goalDifference,
-          points: s.points,
-          form: s.form,
-        }));
+      const leagueStandings = mockPremierLeagueStandings.map((s) => ({
+        position: s.position,
+        team: s.team.name,
+        logo: s.team.logo,
+        played: s.played,
+        won: s.won,
+        drawn: s.drawn,
+        lost: s.lost,
+        goalsFor: s.goalsFor,
+        goalsAgainst: s.goalsAgainst,
+        goalDifference: s.goalDifference,
+        points: s.points,
+        form: s.form,
+      }));
+
+      const popularLeagues = await this.getPopularLeagues();
 
       return {
         liveMatches,
         liveMatchesByLeague:
           LandingPresenterMapper.groupMatchesByLeague(liveMatches),
-        leagueStandings,
+        leagueStandings: [],
         featuredPosts,
         stats,
-        popularLeagues: [],
+        popularLeagues,
       };
     } catch (error) {
       console.error("Error fetching landing data:", error);

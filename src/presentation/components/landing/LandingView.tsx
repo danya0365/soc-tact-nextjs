@@ -231,7 +231,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                       {league.matches.length} นัด
                     </span>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {league.matches.map((match) => (
                       <div
@@ -249,7 +249,11 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                               )}`}
                             ></span>
                             <span className="text-white text-xs font-bold">
-                              {match.status === 'live' ? `${match.minute}'` : match.status === 'finished' ? 'จบการแข่งขัน' : 'ยังไม่เริ่ม'}
+                              {match.status === "live"
+                                ? `${match.minute}'`
+                                : match.status === "finished"
+                                ? "จบการแข่งขัน"
+                                : "ยังไม่เริ่ม"}
                             </span>
                           </div>
                         </div>
@@ -266,7 +270,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                                   className="object-contain"
                                 />
                               ) : (
-                                <span className="text-2xl">{match.homeLogo}</span>
+                                <span className="text-2xl">
+                                  {match.homeLogo}
+                                </span>
                               )}
                               <span className="font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-1">
                                 {match.homeTeam}
@@ -288,7 +294,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                                   className="object-contain"
                                 />
                               ) : (
-                                <span className="text-2xl">{match.awayLogo}</span>
+                                <span className="text-2xl">
+                                  {match.awayLogo}
+                                </span>
                               )}
                               <span className="font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-1">
                                 {match.awayTeam}
@@ -327,15 +335,15 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <div className="flex flex-wrap -mb-px overflow-x-auto">
               {viewModel.popularLeagues.map((league) => (
                 <button
-                  key={league}
-                  onClick={() => actions.setSelectedLeague(league)}
+                  key={league.id}
+                  onClick={() => actions.setSelectedLeague(league.id)}
                   className={`py-3 px-6 text-center border-b-2 font-medium text-sm whitespace-nowrap ${
-                    state.selectedLeague === league
+                    state.selectedLeague === league.id
                       ? "border-green-500 text-green-600 dark:text-green-400"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
                   }`}
                 >
-                  {league}
+                  {league.name}
                 </button>
               ))}
             </div>
