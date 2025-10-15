@@ -22,6 +22,7 @@ export function Navbar() {
     { href: "/", label: "หน้าแรก", icon: "🏠" },
     { href: "/matches", label: "ผลบอลสด", icon: "⚽" },
     { href: "/tactics", label: "วิเคราะห์แทคติค", icon: "🎨" },
+    { href: "/community", label: "ชุมชน", icon: "👥" },
     { href: "/fantasy", label: "Fantasy", icon: "⭐" },
     { href: "/explore", label: "สำรวจ", icon: "🔍" },
   ];
