@@ -4,15 +4,14 @@
  * Integrates with Football API for real data
  */
 
+import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
+import { mockMatches } from "@/src/data/mock/matches.mock";
+import { mockTacticalPosts } from "@/src/data/mock/tactics.mock";
 import {
-  getLiveMatches,
-  getStandingsByLeague,
   LEAGUE_IDS,
   type Match,
   type Standing,
 } from "@/src/infrastructure/api";
-import { mockMatches } from "@/src/data/mock/matches.mock";
-import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
 
 // View Model interfaces for Landing Page
 export interface LiveMatch {
@@ -64,12 +63,23 @@ export interface LandingStats {
   totalLeagues: number;
 }
 
+export interface LeagueMatches {
+  league: string;
+  matches: LiveMatch[];
+}
+
+export interface PopularLeague {
+  id: number;
+  name: string;
+}
+
 export interface LandingViewModel {
   liveMatches: LiveMatch[];
+  liveMatchesByLeague: LeagueMatches[];
   leagueStandings: LeagueStanding[];
   featuredPosts: TacticalPost[];
   stats: LandingStats;
-  popularLeagues: string[];
+  popularLeagues: PopularLeague[];
 }
 
 export class LandingPresenterMapper {
@@ -113,6 +123,25 @@ export class LandingPresenterMapper {
       form: standing.form || [],
     };
   }
+
+  // Group matches by league
+  static groupMatchesByLeague(matches: LiveMatch[]): LeagueMatches[] {
+    const leagueMap = new Map<string, LiveMatch[]>();
+
+    // Group matches by league
+    matches.forEach((match) => {
+      if (!leagueMap.has(match.league)) {
+        leagueMap.set(match.league, []);
+      }
+      leagueMap.get(match.league)?.push(match);
+    });
+
+    // Convert map to array of LeagueMatches
+    return Array.from(leagueMap.entries()).map(([league, matches]) => ({
+      league,
+      matches,
+    }));
+  }
 }
 
 /**
@@ -120,12 +149,23 @@ export class LandingPresenterMapper {
  * Integrates with Football API for real data
  */
 export class LandingPresenter {
+  private async getPopularLeagues(): Promise<PopularLeague[]> {
+    return [
+      { id: LEAGUE_IDS.PREMIER_LEAGUE, name: "Premier League" },
+      { id: LEAGUE_IDS.LA_LIGA, name: "La Liga" },
+      { id: LEAGUE_IDS.SERIE_A, name: "Serie A" },
+      { id: LEAGUE_IDS.BUNDESLIGA, name: "Bundesliga" },
+      { id: LEAGUE_IDS.LIGUE_1, name: "Ligue 1" },
+    ];
+  }
+
   /**
    * Get fallback data when API fails
    */
   private getFallbackData(): LandingViewModel {
     return {
       liveMatches: [],
+      liveMatchesByLeague: [],
       leagueStandings: [],
       featuredPosts: [
         {
@@ -148,49 +188,8 @@ export class LandingPresenter {
         totalMatches: 0,
         totalLeagues: 12,
       },
-      popularLeagues: [
-        "Premier League",
-        "La Liga",
-        "Serie A",
-        "Bundesliga",
-        "Ligue 1",
-      ],
+      popularLeagues: [],
     };
-  }
-
-  private async getApiData() {
-    // Fetch real data from Football API
-    const [liveMatchesData, standingsData] = await Promise.all([
-      getLiveMatches().catch(() => [] as Match[]),
-      getStandingsByLeague(LEAGUE_IDS.PREMIER_LEAGUE).catch(
-        () => [] as Standing[]
-      ),
-    ]);
-
-    // Map to view models
-    const liveMatches = liveMatchesData
-      .slice(0, 3)
-      .map((match) => LandingPresenterMapper.mapToLiveMatch(match));
-
-    const leagueStandings = standingsData
-      .slice(0, 5)
-      .map((standing) => LandingPresenterMapper.mapToLeagueStanding(standing));
-
-    return {
-      liveMatches,
-      leagueStandings,
-    };
-  }
-
-  private async getPopularLeagues() {
-    return [
-      "Premier League",
-      "La Liga",
-      "Serie A",
-      "Bundesliga",
-      "Ligue 1",
-      "Thai Premier League",
-    ];
   }
 
   /**
@@ -199,52 +198,21 @@ export class LandingPresenter {
   async getViewModel(): Promise<LandingViewModel> {
     try {
       // Mock featured tactical posts (will be replaced with real data later)
-      const featuredPosts: TacticalPost[] = [
-        {
-          id: "1",
-          title:
-            "วิเคราะห์แทคติค 4-3-3 ของ Man City ที่ทำให้พวกเขาครองบอลได้มากกว่า 70%",
-          author: "Tactical Genius",
-          authorAvatar: "👨‍💼",
-          excerpt:
-            "การใช้ False 9 และ Inverted Wingers ทำให้ Man City สามารถสร้างพื้นที่ในกลางสนามได้อย่างมีประสิทธิภาพ...",
-          thumbnail: "⚽",
-          formation: "4-3-3",
-          league: "Premier League",
-          upvotes: 245,
-          comments: 38,
-          createdAt: "2024-03-15T10:30:00Z",
-        },
-        {
-          id: "2",
-          title: "ทำไม Arsenal ถึงใช้ Build-up แบบ 3-2-5 และมันได้ผลยังไง?",
-          author: "Football Analyst",
-          authorAvatar: "🎯",
-          excerpt:
-            "Arteta ปรับเปลี่ยนวิธีการเล่นจากหลังด้วยการให้ Fullback เข้ามาเป็น Inverted ทำให้มีตัวเลือกในการส่งบอลมากขึ้น...",
-          thumbnail: "🎨",
-          formation: "4-3-3 → 3-2-5",
-          league: "Premier League",
-          upvotes: 189,
-          comments: 27,
-          createdAt: "2024-03-14T15:20:00Z",
-        },
-        {
-          id: "3",
-          title:
-            "การกดตัวสูงของ Liverpool: High Press ที่มีประสิทธิภาพที่สุดในยุโรป",
-          author: "Press Master",
-          authorAvatar: "⚡",
-          excerpt:
-            "Klopp ใช้ระบบ Gegenpressing ที่ทำให้ Liverpool สามารถกดเอาบอลคืนภายใน 5 วินาทีหลังเสียบอล...",
-          thumbnail: "🔥",
-          formation: "4-3-3",
-          league: "Premier League",
-          upvotes: 312,
-          comments: 45,
-          createdAt: "2024-03-13T09:15:00Z",
-        },
-      ];
+      const featuredPosts: TacticalPost[] = mockTacticalPosts
+        .slice(0, 3)
+        .map((post) => ({
+          id: post.id,
+          title: post.title,
+          author: post.author.name,
+          authorAvatar: post.author.avatar,
+          excerpt: post.excerpt,
+          thumbnail: post.thumbnail,
+          formation: post.formation,
+          league: post.league,
+          upvotes: post.upvotes,
+          comments: post.comments,
+          createdAt: post.createdAt,
+        }));
 
       // Stats (using real data where available)
       const stats: LandingStats = {
@@ -254,13 +222,9 @@ export class LandingPresenter {
         totalLeagues: 12,
       };
 
-      // Popular leagues
-      const popularLeagues = await this.getPopularLeagues();
-
       // Use mock data for landing page
       const liveMatches = mockMatches
         .filter((m) => m.status === "live" || m.status === "upcoming")
-        .slice(0, 4)
         .map((match) => ({
           id: match.id,
           homeTeam: match.homeTeam.name,
@@ -274,7 +238,7 @@ export class LandingPresenter {
           awayLogo: "⚽",
         }));
 
-      const leagueStandings = mockPremierLeagueStandings.slice(0, 5).map((s) => ({
+      const leagueStandings = mockPremierLeagueStandings.map((s) => ({
         position: s.position,
         team: s.team.name,
         logo: s.team.logo,
@@ -289,9 +253,13 @@ export class LandingPresenter {
         form: s.form,
       }));
 
+      const popularLeagues = await this.getPopularLeagues();
+
       return {
         liveMatches,
-        leagueStandings,
+        liveMatchesByLeague:
+          LandingPresenterMapper.groupMatchesByLeague(liveMatches),
+        leagueStandings: [],
         featuredPosts,
         stats,
         popularLeagues,
@@ -330,7 +298,7 @@ export class LandingPresenterFactory {
   static createClient(): LandingPresenter {
     return new LandingPresenter();
   }
-  static createServer(): LandingPresenter {
+  static async createServer(): Promise<LandingPresenter> {
     return new LandingPresenter();
   }
 }

@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
-import "../public/styles/index.css";
 import { MainLayout } from "@/src/presentation/components/layout/MainLayout";
+import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
+import "../public/styles/index.css";
 
 export const metadata: Metadata = {
   title: "Soccer Tactics - วิเคราะห์แทคติคฟุตบอล",
@@ -21,9 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="th" suppressHydrationWarning>
       <body className="antialiased">
-        <MainLayout>{children}</MainLayout>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <MainLayout>{children}</MainLayout>
+        </ThemeProvider>
       </body>
     </html>
   );
