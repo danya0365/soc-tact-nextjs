@@ -4,6 +4,9 @@
  * Integrates with Football API for real data
  */
 
+import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
+import { mockMatches } from "@/src/data/mock/matches.mock";
+import { mockTacticalPosts } from "@/src/data/mock/tactics.mock";
 import {
   getLiveMatches,
   getStandingsByLeague,
@@ -11,8 +14,6 @@ import {
   type Match,
   type Standing,
 } from "@/src/infrastructure/api";
-import { mockMatches } from "@/src/data/mock/matches.mock";
-import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
 
 // View Model interfaces for Landing Page
 export interface LiveMatch {
@@ -199,52 +200,21 @@ export class LandingPresenter {
   async getViewModel(): Promise<LandingViewModel> {
     try {
       // Mock featured tactical posts (will be replaced with real data later)
-      const featuredPosts: TacticalPost[] = [
-        {
-          id: "1",
-          title:
-            "วิเคราะห์แทคติค 4-3-3 ของ Man City ที่ทำให้พวกเขาครองบอลได้มากกว่า 70%",
-          author: "Tactical Genius",
-          authorAvatar: "👨‍💼",
-          excerpt:
-            "การใช้ False 9 และ Inverted Wingers ทำให้ Man City สามารถสร้างพื้นที่ในกลางสนามได้อย่างมีประสิทธิภาพ...",
-          thumbnail: "⚽",
-          formation: "4-3-3",
-          league: "Premier League",
-          upvotes: 245,
-          comments: 38,
-          createdAt: "2024-03-15T10:30:00Z",
-        },
-        {
-          id: "2",
-          title: "ทำไม Arsenal ถึงใช้ Build-up แบบ 3-2-5 และมันได้ผลยังไง?",
-          author: "Football Analyst",
-          authorAvatar: "🎯",
-          excerpt:
-            "Arteta ปรับเปลี่ยนวิธีการเล่นจากหลังด้วยการให้ Fullback เข้ามาเป็น Inverted ทำให้มีตัวเลือกในการส่งบอลมากขึ้น...",
-          thumbnail: "🎨",
-          formation: "4-3-3 → 3-2-5",
-          league: "Premier League",
-          upvotes: 189,
-          comments: 27,
-          createdAt: "2024-03-14T15:20:00Z",
-        },
-        {
-          id: "3",
-          title:
-            "การกดตัวสูงของ Liverpool: High Press ที่มีประสิทธิภาพที่สุดในยุโรป",
-          author: "Press Master",
-          authorAvatar: "⚡",
-          excerpt:
-            "Klopp ใช้ระบบ Gegenpressing ที่ทำให้ Liverpool สามารถกดเอาบอลคืนภายใน 5 วินาทีหลังเสียบอล...",
-          thumbnail: "🔥",
-          formation: "4-3-3",
-          league: "Premier League",
-          upvotes: 312,
-          comments: 45,
-          createdAt: "2024-03-13T09:15:00Z",
-        },
-      ];
+      const featuredPosts: TacticalPost[] = mockTacticalPosts
+        .slice(0, 3)
+        .map((post) => ({
+          id: post.id,
+          title: post.title,
+          author: post.author.name,
+          authorAvatar: post.author.avatar,
+          excerpt: post.excerpt,
+          thumbnail: post.thumbnail,
+          formation: post.formation,
+          league: post.league,
+          upvotes: post.upvotes,
+          comments: post.comments,
+          createdAt: post.createdAt,
+        }));
 
       // Stats (using real data where available)
       const stats: LandingStats = {
@@ -274,20 +244,22 @@ export class LandingPresenter {
           awayLogo: "⚽",
         }));
 
-      const leagueStandings = mockPremierLeagueStandings.slice(0, 5).map((s) => ({
-        position: s.position,
-        team: s.team.name,
-        logo: s.team.logo,
-        played: s.played,
-        won: s.won,
-        drawn: s.drawn,
-        lost: s.lost,
-        goalsFor: s.goalsFor,
-        goalsAgainst: s.goalsAgainst,
-        goalDifference: s.goalDifference,
-        points: s.points,
-        form: s.form,
-      }));
+      const leagueStandings = mockPremierLeagueStandings
+        .slice(0, 5)
+        .map((s) => ({
+          position: s.position,
+          team: s.team.name,
+          logo: s.team.logo,
+          played: s.played,
+          won: s.won,
+          drawn: s.drawn,
+          lost: s.lost,
+          goalsFor: s.goalsFor,
+          goalsAgainst: s.goalsAgainst,
+          goalDifference: s.goalDifference,
+          points: s.points,
+          form: s.form,
+        }));
 
       return {
         liveMatches,
@@ -330,7 +302,7 @@ export class LandingPresenterFactory {
   static createClient(): LandingPresenter {
     return new LandingPresenter();
   }
-  static createServer(): LandingPresenter {
+  static async createServer(): Promise<LandingPresenter> {
     return new LandingPresenter();
   }
 }

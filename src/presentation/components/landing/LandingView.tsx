@@ -3,6 +3,7 @@
 import { LandingViewModel } from "@/src/presentation/presenters/landing/LandingPresenter";
 import { useLandingPresenter } from "@/src/presentation/presenters/landing/useLandingPresenter";
 import Image from "next/image";
+import Link from "next/link";
 
 interface LandingViewProps {
   initialViewModel?: LandingViewModel;
@@ -38,17 +39,6 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
         return "bg-gray-500";
     }
   };
-
-  // Helper function for date formatting (reserved for future use)
-  // const formatDate = (dateString: string) => {
-  //   return new Intl.DateTimeFormat("th-TH", {
-  //     year: "numeric",
-  //     month: "short",
-  //     day: "numeric",
-  //     hour: "2-digit",
-  //     minute: "2-digit",
-  //   }).format(new Date(dateString));
-  // };
 
   // Loading state
   if (state.loading && !viewModel) {
@@ -105,7 +95,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
       <section className="landing-hero relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-green-700 to-green-900 opacity-95"></div>
         <div className="absolute inset-0 bg-[url('/pitch-pattern.svg')] opacity-10"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
           <div className="text-center">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6">
@@ -206,9 +196,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1">
-                      {match.homeLogo.startsWith('http') ? (
-                        <Image 
-                          src={match.homeLogo} 
+                      {match.homeLogo.startsWith("http") ? (
+                        <Image
+                          src={match.homeLogo}
                           alt={match.homeTeam}
                           width={32}
                           height={32}
@@ -228,9 +218,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
-                      {match.awayLogo.startsWith('http') ? (
-                        <Image 
-                          src={match.awayLogo} 
+                      {match.awayLogo.startsWith("http") ? (
+                        <Image
+                          src={match.awayLogo}
                           alt={match.awayTeam}
                           width={32}
                           height={32}
@@ -259,19 +249,34 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
               📊 ตารางคะแนน
             </h2>
-            <select
-              value={state.selectedLeague}
-              onChange={(e) => actions.setSelectedLeague(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+            <Link
+              href="/standings"
+              className="text-green-600 hover:text-green-700 font-medium"
             >
-              {viewModel.popularLeagues.map((league) => (
-                <option key={league} value={league}>
-                  {league}
-                </option>
-              ))}
-            </select>
+              ดูทั้งหมด →
+            </Link>
           </div>
 
+          {/* League Tabs */}
+          <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+            <div className="flex flex-wrap -mb-px overflow-x-auto">
+              {viewModel.popularLeagues.map((league) => (
+                <button
+                  key={league}
+                  onClick={() => actions.setSelectedLeague(league)}
+                  className={`py-3 px-6 text-center border-b-2 font-medium text-sm whitespace-nowrap ${
+                    state.selectedLeague === league
+                      ? "border-green-500 text-green-600 dark:text-green-400"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                  }`}
+                >
+                  {league}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* League Table */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full">
@@ -317,9 +322,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          {team.logo.startsWith('http') ? (
-                            <Image 
-                              src={team.logo} 
+                          {team.logo.startsWith("http") ? (
+                            <Image
+                              src={team.logo}
                               alt={team.team}
                               width={24}
                               height={24}
@@ -449,86 +454,6 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
           </button>
         </section>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-2xl font-bold mb-4">⚽ Soccer Tactics</h3>
-              <p className="text-gray-400">
-                แพลตฟอร์มวิเคราะห์แทคติคฟุตบอลอันดับ 1 ของไทย
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">เกี่ยวกับเรา</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    เกี่ยวกับเรา
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    ทีมงาน
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    ติดต่อเรา
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">ฟีเจอร์</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    บทวิเคราะห์
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    ผลบอลสด
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    ตารางคะแนน
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">ติดตามเรา</h4>
-              <div className="flex gap-4">
-                <a
-                  href="#"
-                  className="text-2xl hover:text-green-400 transition-colors"
-                >
-                  📘
-                </a>
-                <a
-                  href="#"
-                  className="text-2xl hover:text-green-400 transition-colors"
-                >
-                  🐦
-                </a>
-                <a
-                  href="#"
-                  className="text-2xl hover:text-green-400 transition-colors"
-                >
-                  📷
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>© 2025 Soccer Tactics. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

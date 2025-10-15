@@ -1,9 +1,9 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -21,7 +21,6 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "หน้าแรก", icon: "🏠" },
     { href: "/matches", label: "ผลบอลสด", icon: "⚽" },
-    { href: "/leagues", label: "ตารางคะแนน", icon: "🏆" },
     { href: "/tactics", label: "วิเคราะห์แทคติค", icon: "🎨" },
     { href: "/fantasy", label: "Fantasy", icon: "⭐" },
     { href: "/explore", label: "สำรวจ", icon: "🔍" },
@@ -103,7 +102,9 @@ export function Navbar() {
                 placeholder="ค้นหา..."
                 className="w-28 xl:w-48 px-2.5 py-1.5 pl-8 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100"
               />
-              <span className="absolute left-2 top-2 text-gray-400 text-sm">🔍</span>
+              <span className="absolute left-2 top-2 text-gray-400 text-sm">
+                🔍
+              </span>
             </form>
 
             {/* Dark Mode Toggle */}
@@ -113,7 +114,9 @@ export function Navbar() {
               aria-label="Toggle dark mode"
             >
               {mounted ? (
-                <span className="text-lg">{theme === "dark" ? "🌙" : "☀️"}</span>
+                <span className="text-lg">
+                  {theme === "dark" ? "🌙" : "☀️"}
+                </span>
               ) : (
                 <span className="w-5 h-5 inline-block"></span>
               )}
@@ -139,7 +142,11 @@ export function Navbar() {
               aria-label="Toggle dark mode"
             >
               {mounted ? (
-                theme === "dark" ? "🌙" : "☀️"
+                theme === "dark" ? (
+                  "🌙"
+                ) : (
+                  "☀️"
+                )
               ) : (
                 <span className="w-6 h-6"></span>
               )}
@@ -185,7 +192,9 @@ export function Navbar() {
                     placeholder="ค้นหา..."
                     className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100"
                   />
-                  <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
+                  <span className="absolute left-3 top-2.5 text-gray-400">
+                    🔍
+                  </span>
                 </div>
               </form>
 
