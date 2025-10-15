@@ -102,3 +102,8 @@ export const GROUP_PRIVACY_TYPES = {
     description: "Only members can find and see this group",
   },
 };
+
+// Helper function to get group type by ID
+export function getGroupTypeById(id: string): GroupType | undefined {
+  return GROUP_TYPES.find((type) => type.id === id);
+}
