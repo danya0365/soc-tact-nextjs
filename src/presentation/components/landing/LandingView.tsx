@@ -171,76 +171,124 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {viewModel.liveMatches.map((match) => (
-              <div
-                key={match.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                <div className="bg-gradient-to-r from-green-600 to-green-700 px-4 py-2 flex items-center justify-between">
-                  <span className="text-white text-sm font-medium">
-                    {match.league}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`w-2 h-2 rounded-full ${getStatusColor(
-                        match.status
-                      )}`}
-                    ></span>
-                    <span className="text-white text-sm font-bold">
-                      {match.minute}&apos;
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3 flex-1">
-                      {match.homeLogo.startsWith("http") ? (
-                        <Image
-                          src={match.homeLogo}
-                          alt={match.homeTeam}
-                          width={32}
-                          height={32}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <span className="text-3xl">{match.homeLogo}</span>
-                      )}
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        {match.homeTeam}
-                      </span>
-                    </div>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                      {match.homeScore}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      {match.awayLogo.startsWith("http") ? (
-                        <Image
-                          src={match.awayLogo}
-                          alt={match.awayTeam}
-                          width={32}
-                          height={32}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <span className="text-3xl">{match.awayLogo}</span>
-                      )}
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        {match.awayTeam}
-                      </span>
-                    </div>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                      {match.awayScore}
-                    </span>
-                  </div>
-                </div>
+          {viewModel.liveMatches.length === 0 ? (
+            // Empty State
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+              <div className="mx-auto w-24 h-24 mb-4 text-gray-300 dark:text-gray-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
               </div>
-            ))}
-          </div>
+              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                ยังไม่มีแมตช์ที่กำลังแข่งขัน
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                ไม่พบแมตช์ที่กำลังแข่งขันอยู่ในขณะนี้
+                โปรดลองตรวจสอบอีกครั้งในภายหลัง
+              </p>
+              <button
+                onClick={actions.refreshData}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                <svg
+                  className="-ml-1 mr-2 h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                โหลดข้อมูลใหม่
+              </button>
+            </div>
+          ) : (
+            // Live Matches Grid
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {viewModel.liveMatches.map((match) => (
+                <div
+                  key={match.id}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  <div className="bg-gradient-to-r from-green-600 to-green-700 px-4 py-2 flex items-center justify-between">
+                    <span className="text-white text-sm font-medium">
+                      {match.league}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`w-2 h-2 rounded-full ${getStatusColor(
+                          match.status
+                        )}`}
+                      ></span>
+                      <span className="text-white text-sm font-bold">
+                        {match.minute}&apos;
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3 flex-1">
+                        {match.homeLogo.startsWith("http") ? (
+                          <Image
+                            src={match.homeLogo}
+                            alt={match.homeTeam}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                          />
+                        ) : (
+                          <span className="text-3xl">{match.homeLogo}</span>
+                        )}
+                        <span className="font-semibold text-gray-900 dark:text-gray-100">
+                          {match.homeTeam}
+                        </span>
+                      </div>
+                      <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                        {match.homeScore}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1">
+                        {match.awayLogo.startsWith("http") ? (
+                          <Image
+                            src={match.awayLogo}
+                            alt={match.awayTeam}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                          />
+                        ) : (
+                          <span className="text-3xl">{match.awayLogo}</span>
+                        )}
+                        <span className="font-semibold text-gray-900 dark:text-gray-100">
+                          {match.awayTeam}
+                        </span>
+                      </div>
+                      <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                        {match.awayScore}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* League Table Section */}
