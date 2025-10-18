@@ -5,11 +5,9 @@
  */
 
 import {
-  mockMatches,
   getMatchesByStatus,
-  getMatchesByLeague,
-  getMatchesByDate,
-  type MockMatch,
+  MockMatch,
+  mockMatches,
 } from "@/src/data/mock/matches.mock";
 
 // View Model interfaces
@@ -68,11 +66,78 @@ export interface MatchFilters {
 
 export interface MatchesViewModel {
   matches: Match[];
+  matchesByLeague: LeagueMatches[];
   stats: MatchStats;
   filters: MatchFilters;
   totalCount: number;
   page: number;
   perPage: number;
+}
+
+export interface LeagueMatches {
+  league: string;
+  matches: Match[];
+}
+
+export class MatchPresenterMapper {
+  /**
+   * Map API Match to LiveMatch view model
+   */
+  static mapToMatch(match: MockMatch): Match {
+    return {
+      id: match.id.toString(),
+      homeTeam: {
+        id: match.homeTeam.id,
+        name: match.homeTeam.name,
+        logo: match.homeTeam.logo,
+        shortName: match.homeTeam.shortName,
+      },
+      awayTeam: {
+        id: match.awayTeam.id,
+        name: match.awayTeam.name,
+        logo: match.awayTeam.logo,
+        shortName: match.awayTeam.shortName,
+      },
+      score: {
+        home: match.score.home ?? 0,
+        away: match.score.away ?? 0,
+      },
+      minute: match.minute ?? 0,
+      status: match.status,
+      league: {
+        id: match.league.id,
+        name: match.league.name,
+        logo: match.league.logo,
+        country: match.league.country,
+      },
+      venue: {
+        name: match.venue.name,
+        city: match.venue.city,
+      },
+      date: match.date,
+      time: match.time,
+      referee: match.referee,
+    };
+  }
+
+  // Group matches by league
+  static groupMatchesByLeague(matches: Match[]): LeagueMatches[] {
+    const leagueMap = new Map<string, Match[]>();
+
+    // Group matches by league
+    matches.forEach((match) => {
+      if (!leagueMap.has(match.league.name)) {
+        leagueMap.set(match.league.name, []);
+      }
+      leagueMap.get(match.league.name)?.push(match);
+    });
+
+    // Convert map to array of LeagueMatches
+    return Array.from(leagueMap.entries()).map(([league, matches]) => ({
+      league,
+      matches,
+    }));
+  }
 }
 
 /**
@@ -138,6 +203,8 @@ export class MatchesPresenter {
 
       return {
         matches: paginatedMatches,
+        matchesByLeague:
+          MatchPresenterMapper.groupMatchesByLeague(paginatedMatches),
         stats,
         filters,
         totalCount,
@@ -188,19 +255,16 @@ export class MatchesPresenter {
     Array<{ id: string; name: string; logo: string }>
   > {
     try {
-      const leagues = mockMatches.reduce(
-        (acc, match) => {
-          if (!acc.find((l) => l.id === match.league.id)) {
-            acc.push({
-              id: match.league.id,
-              name: match.league.name,
-              logo: match.league.logo,
-            });
-          }
-          return acc;
-        },
-        [] as Array<{ id: string; name: string; logo: string }>
-      );
+      const leagues = mockMatches.reduce((acc, match) => {
+        if (!acc.find((l) => l.id === match.league.id)) {
+          acc.push({
+            id: match.league.id,
+            name: match.league.name,
+            logo: match.league.logo,
+          });
+        }
+        return acc;
+      }, [] as Array<{ id: string; name: string; logo: string }>);
       return leagues;
     } catch (error) {
       console.error("Error in MatchesPresenter.getAvailableLeagues:", error);

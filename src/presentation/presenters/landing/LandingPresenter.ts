@@ -4,7 +4,6 @@
  * Integrates with Football API for real data
  */
 
-import { mockPremierLeagueStandings } from "@/src/data/mock/leagues.mock";
 import { mockMatches } from "@/src/data/mock/matches.mock";
 import { mockTacticalPosts } from "@/src/data/mock/tactics.mock";
 import {
@@ -237,21 +236,6 @@ export class LandingPresenter {
           homeLogo: "⚽",
           awayLogo: "⚽",
         }));
-
-      const leagueStandings = mockPremierLeagueStandings.map((s) => ({
-        position: s.position,
-        team: s.team.name,
-        logo: s.team.logo,
-        played: s.played,
-        won: s.won,
-        drawn: s.drawn,
-        lost: s.lost,
-        goalsFor: s.goalsFor,
-        goalsAgainst: s.goalsAgainst,
-        goalDifference: s.goalDifference,
-        points: s.points,
-        form: s.form,
-      }));
 
       const popularLeagues = await this.getPopularLeagues();
 

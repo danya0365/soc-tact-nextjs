@@ -3,7 +3,6 @@
 import { useMatchesPresenter } from "@/src/presentation/presenters/matches/useMatchesPresenter";
 import type { MatchesViewModel } from "@/src/presentation/presenters/matches/MatchesPresenter";
 import Link from "next/link";
-import { useState } from "react";
 
 interface MatchesViewProps {
   initialViewModel?: MatchesViewModel;
@@ -246,7 +245,7 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
         </div>
 
         {/* Matches List */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {viewModel.matches.length === 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
               <div className="text-gray-400 text-6xl mb-4">⚽</div>
@@ -258,87 +257,109 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
               </p>
             </div>
           ) : (
-            viewModel.matches.map((match) => (
-              <Link
-                key={match.id}
-                href={`/matches/${match.id}`}
-                className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg">{match.league.logo}</span>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {match.league.name}
-                    </span>
-                  </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                      match.status
-                    )}`}
-                  >
-                    {match.status === "live" && match.minute
-                      ? `${match.minute}'`
-                      : getStatusText(match.status)}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 items-center">
-                  {/* Home Team */}
-                  <div className="text-right">
-                    <div className="flex items-center justify-end space-x-2 mb-1">
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        {match.homeTeam.name}
-                      </span>
-                      <span className="text-2xl">{match.homeTeam.logo}</span>
+            viewModel.matchesByLeague.map((leagueGroup) => {
+              const leagueInfo = leagueGroup.matches[0]?.league;
+              return (
+                <div key={leagueGroup.league} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      {leagueInfo?.logo && (
+                        <span className="text-xl">{leagueInfo.logo}</span>
+                      )}
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                          {leagueGroup.league}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {leagueGroup.matches.length} นัดแข่งขัน
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {match.homeTeam.shortName}
-                    </span>
                   </div>
 
-                  {/* Score */}
-                  <div className="text-center">
-                    {match.status === "upcoming" ? (
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        <div>{formatDate(match.date)}</div>
-                        <div className="font-semibold">
-                          {formatTime(match.time)}
+                  <div className="space-y-4">
+                    {leagueGroup.matches.map((match) => (
+                      <Link
+                        key={match.id}
+                        href={`/matches/${match.id}`}
+                        className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                              match.status
+                            )}`}
+                          >
+                            {match.status === "live" && match.minute
+                              ? `${match.minute}'`
+                              : getStatusText(match.status)}
+                          </span>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            {match.league.country}
+                          </span>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        {match.score.home} - {match.score.away}
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Away Team */}
-                  <div className="text-left">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-2xl">{match.awayTeam.logo}</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        {match.awayTeam.name}
-                      </span>
-                    </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {match.awayTeam.shortName}
-                    </span>
+                        <div className="grid grid-cols-3 gap-4 items-center">
+                          {/* Home Team */}
+                          <div className="text-right">
+                            <div className="flex items-center justify-end space-x-2 mb-1">
+                              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                {match.homeTeam.name}
+                              </span>
+                              <span className="text-2xl">{match.homeTeam.logo}</span>
+                            </div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {match.homeTeam.shortName}
+                            </span>
+                          </div>
+
+                          {/* Score */}
+                          <div className="text-center">
+                            {match.status === "upcoming" ? (
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                <div>{formatDate(match.date)}</div>
+                                <div className="font-semibold">
+                                  {formatTime(match.time)}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                                {match.score.home} - {match.score.away}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Away Team */}
+                          <div className="text-left">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="text-2xl">{match.awayTeam.logo}</span>
+                              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                {match.awayTeam.name}
+                              </span>
+                            </div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {match.awayTeam.shortName}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center space-x-4">
+                              <span>📍 {match.venue.name}</span>
+                              {match.referee && <span>👨‍⚖️ {match.referee}</span>}
+                            </div>
+                            {match.status !== "upcoming" && (
+                              <span>{formatDate(match.date)}</span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center space-x-4">
-                      <span>📍 {match.venue.name}</span>
-                      {match.referee && <span>👨‍⚖️ {match.referee}</span>}
-                    </div>
-                    {match.status !== "upcoming" && (
-                      <span>{formatDate(match.date)}</span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))
+              );
+            })
           )}
         </div>
 
