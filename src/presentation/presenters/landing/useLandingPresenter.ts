@@ -98,6 +98,9 @@ export function useLandingPresenter(
         LandingPresenterMapper.mapToLiveMatch(match)
       );
 
+      const mappedLiveMatchesByLeague =
+        LandingPresenterMapper.groupMatchesByLeague(mappedLiveMatches);
+
       const mappedStandings = standings.map((standing) =>
         LandingPresenterMapper.mapToLeagueStanding(standing)
       );
@@ -107,8 +110,8 @@ export function useLandingPresenter(
       // Replace API data with cached/fresh data from footballData
       setViewModel({
         ...viewModel,
-        liveMatches: viewModel?.liveMatches || mappedLiveMatches,
-        liveMatchesByLeague: viewModel?.liveMatchesByLeague || [],
+        liveMatches: mappedLiveMatches,
+        liveMatchesByLeague: mappedLiveMatchesByLeague,
         leagueStandings: mappedStandings,
         featuredPosts: newViewModel.featuredPosts,
         stats: {
