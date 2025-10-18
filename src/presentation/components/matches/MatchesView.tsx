@@ -8,6 +8,7 @@ import { useMatchesPresenter } from "@/src/presentation/presenters/matches/useMa
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
+import { MatchesViewSkeleton } from "./MatchesViewSkeleton";
 
 interface MatchesViewProps {
   initialViewModel?: MatchesViewModel;
@@ -63,21 +64,8 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
   };
 
   // Show loading only on initial load
-  if (state.loading && !viewModel) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">
-                กำลังโหลดข้อมูลการแข่งขัน...
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (state.loading && !viewModel?.matches.length) {
+    return <MatchesViewSkeleton />;
   }
 
   // Show error state
