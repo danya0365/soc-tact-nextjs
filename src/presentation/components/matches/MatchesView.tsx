@@ -1,8 +1,13 @@
 "use client";
 
+import type {
+  MatchFilters,
+  MatchesViewModel,
+} from "@/src/presentation/presenters/matches/MatchesPresenter";
 import { useMatchesPresenter } from "@/src/presentation/presenters/matches/useMatchesPresenter";
-import type { MatchesViewModel } from "@/src/presentation/presenters/matches/MatchesPresenter";
+import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
 
 interface MatchesViewProps {
   initialViewModel?: MatchesViewModel;
@@ -11,6 +16,8 @@ interface MatchesViewProps {
 export function MatchesView({ initialViewModel }: MatchesViewProps) {
   const [state, actions] = useMatchesPresenter(initialViewModel);
   const viewModel = state.viewModel;
+
+  const today = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   // Helper functions
   const getStatusColor = (status: string) => {
@@ -201,6 +208,25 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                วันที่แข่งขัน
+              </label>
+              <input
+                type="date"
+                value={state.filters.date || today}
+                max={today}
+                onChange={(e) =>
+                  actions.setFilters({
+                    ...state.filters,
+                    date: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100"
+              />
+            </div>
+
             {/* Status Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -208,12 +234,13 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
               </label>
               <select
                 value={state.filters.status || "all"}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const nextStatus = e.target.value as MatchFilters["status"];
                   actions.setFilters({
                     ...state.filters,
-                    status: e.target.value as any,
-                  })
-                }
+                    status: nextStatus,
+                  });
+                }}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100"
               >
                 <option value="all">ทั้งหมด</option>
@@ -224,7 +251,7 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
             </div>
 
             {/* Search */}
-            <div className="md:col-span-3">
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 ค้นหา
               </label>
@@ -264,7 +291,19 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       {leagueInfo?.logo && (
-                        <span className="text-xl">{leagueInfo.logo}</span>
+                        <>
+                          {leagueInfo.logo.startsWith("http") ? (
+                            <Image
+                              src={leagueInfo.logo}
+                              alt={leagueInfo.name}
+                              width={24}
+                              height={24}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <span className="text-xl">{leagueInfo.logo}</span>
+                          )}
+                        </>
                       )}
                       <div>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -306,7 +345,19 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                               <span className="font-semibold text-gray-900 dark:text-gray-100">
                                 {match.homeTeam.name}
                               </span>
-                              <span className="text-2xl">{match.homeTeam.logo}</span>
+                              {match.homeTeam.logo.startsWith("http") ? (
+                                <Image
+                                  src={match.homeTeam.logo}
+                                  alt={match.homeTeam.name}
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
+                                />
+                              ) : (
+                                <span className="text-2xl">
+                                  {match.homeTeam.logo}
+                                </span>
+                              )}
                             </div>
                             <span className="text-sm text-gray-500 dark:text-gray-400">
                               {match.homeTeam.shortName}
@@ -332,7 +383,19 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                           {/* Away Team */}
                           <div className="text-left">
                             <div className="flex items-center space-x-2 mb-1">
-                              <span className="text-2xl">{match.awayTeam.logo}</span>
+                              {match.awayTeam.logo.startsWith("http") ? (
+                                <Image
+                                  src={match.awayTeam.logo}
+                                  alt={match.awayTeam.name}
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
+                                />
+                              ) : (
+                                <span className="text-2xl">
+                                  {match.awayTeam.logo}
+                                </span>
+                              )}
                               <span className="font-semibold text-gray-900 dark:text-gray-100">
                                 {match.awayTeam.name}
                               </span>
@@ -363,32 +426,15 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
           )}
         </div>
 
-        {/* Pagination */}
-        {viewModel.totalCount > viewModel.perPage && (
+        {/* Load More */}
+        {state.hasMore && (
           <div className="mt-8 flex justify-center">
-            <div className="flex space-x-2">
-              <button
-                onClick={() => actions.setCurrentPage(state.currentPage - 1)}
-                disabled={state.currentPage === 1}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-              >
-                ก่อนหน้า
-              </button>
-              <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
-                หน้า {state.currentPage} จาก{" "}
-                {Math.ceil(viewModel.totalCount / viewModel.perPage)}
-              </span>
-              <button
-                onClick={() => actions.setCurrentPage(state.currentPage + 1)}
-                disabled={
-                  state.currentPage ===
-                  Math.ceil(viewModel.totalCount / viewModel.perPage)
-                }
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-              >
-                ถัดไป
-              </button>
-            </div>
+            <button
+              onClick={actions.loadMore}
+              className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition-colors"
+            >
+              โหลดเพิ่มเติม
+            </button>
           </div>
         )}
 

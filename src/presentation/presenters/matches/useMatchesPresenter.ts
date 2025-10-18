@@ -16,20 +16,24 @@ import {
   type Match as PresenterMatch,
 } from "./MatchesPresenter";
 
+const INITIAL_BATCH_SIZE = 100;
+const LOAD_MORE_STEP = 30;
+
 // State interface
 export interface MatchesPresenterState {
   viewModel: MatchesViewModel | null;
   loading: boolean;
   error: string | null;
   filters: MatchFilters;
-  currentPage: number;
+  visibleCount: number;
+  hasMore: boolean;
 }
 
 // Actions interface
 export interface MatchesPresenterActions {
   refreshData: () => Promise<void>;
   setFilters: (filters: MatchFilters) => void;
-  setCurrentPage: (page: number) => void;
+  loadMore: () => void;
   reset: () => void;
   setError: (error: string | null) => void;
 }
@@ -49,11 +53,26 @@ export function useMatchesPresenter(
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFiltersState] = useState<MatchFilters>(
-    initialViewModel?.filters || {}
+  const today = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const [filters, setFiltersState] = useState<MatchFilters>(() => {
+    const base = initialViewModel?.filters
+      ? { ...initialViewModel.filters }
+      : {};
+    if (!base.date) {
+      base.date = today;
+    }
+    return base;
+  });
+  const [allMatches, setAllMatches] = useState<PresenterMatch[]>(
+    initialViewModel?.matches ?? []
   );
-  const [currentPage, setCurrentPageState] = useState(
-    initialViewModel?.page || 1
+  const [visibleCount, setVisibleCount] = useState(() =>
+    initialViewModel?.perPage && initialViewModel.perPage > 0
+      ? initialViewModel.perPage
+      : Math.min(
+          INITIAL_BATCH_SIZE,
+          initialViewModel?.matches.length ?? INITIAL_BATCH_SIZE
+        )
   );
 
   // Get football data presenter for caching
@@ -63,8 +82,6 @@ export function useMatchesPresenter(
    * Load initial data from cache or API
    * Check cache first via useFootballDataPresenter, if not found fetch from API
    */
-  const perPage = useMemo(() => 10, []);
-
   const mapStatusToViewStatus = useCallback(
     (status: DomainMatch["status"] | string | undefined) => {
       switch (status) {
@@ -102,8 +119,25 @@ export function useMatchesPresenter(
           shortName: team.shortName || team.name.slice(0, 3).toUpperCase(),
         });
 
-        const kickoffDate = new Date(match.timestamp * 1000 || match.date);
-        const hasValidDate = !Number.isNaN(kickoffDate.getTime());
+        const rawTimestamp = match.timestamp;
+        const isMillis =
+          typeof rawTimestamp === "number" && rawTimestamp > 1e12;
+        const sourceDate = isMillis
+          ? new Date(rawTimestamp)
+          : rawTimestamp
+          ? new Date(rawTimestamp * 1000)
+          : new Date(match.date);
+        const hasValidDate = !Number.isNaN(sourceDate.getTime());
+
+        const kickoffDate = hasValidDate ? sourceDate : new Date();
+
+        const formattedDate = kickoffDate.toISOString();
+        const formattedTime = kickoffDate.toLocaleTimeString("th-TH", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Asia/Bangkok",
+        });
 
         return {
           id: match.id.toString(),
@@ -131,13 +165,8 @@ export function useMatchesPresenter(
             name: match.venue || "สนามแข่งขัน",
             city: match.league.country,
           },
-          date: hasValidDate ? kickoffDate.toISOString() : match.date,
-          time: hasValidDate
-            ? kickoffDate.toLocaleTimeString("th-TH", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "",
+          date: hasValidDate ? formattedDate : match.date,
+          time: hasValidDate ? formattedTime : "",
           referee: undefined,
         };
       } catch (error) {
@@ -157,7 +186,12 @@ export function useMatchesPresenter(
       const leagueFilter = filters.league
         ? Number.parseInt(filters.league, 10)
         : undefined;
-      const dateFilter = filters.date;
+      const dateFilter =
+        filters.date && filters.date.trim() !== "" ? filters.date : today;
+
+      if (!filters.date || filters.date.trim() === "") {
+        setFiltersState((prev) => ({ ...prev, date: dateFilter }));
+      }
 
       const fetchMatches = async (): Promise<DomainMatch[]> => {
         if (dateFilter) {
@@ -226,12 +260,8 @@ export function useMatchesPresenter(
         .map(mapDomainMatchToPresenterMatch)
         .filter((match): match is PresenterMatch => Boolean(match));
 
-      const totalCount = mappedMatches.length;
-      const startIndex = (currentPage - 1) * perPage;
-      const paginatedMatches = mappedMatches.slice(
-        startIndex,
-        startIndex + perPage
-      );
+      const initialVisible = Math.min(mappedMatches.length, INITIAL_BATCH_SIZE);
+      const limitedMatches = mappedMatches.slice(0, initialVisible);
 
       const stats = {
         totalMatches: mappedMatches.length,
@@ -245,15 +275,17 @@ export function useMatchesPresenter(
         ).length,
       };
 
+      setAllMatches(mappedMatches);
+      setVisibleCount(initialVisible);
       setViewModel({
-        matches: paginatedMatches,
+        matches: limitedMatches,
         matchesByLeague:
-          MatchPresenterMapper.groupMatchesByLeague(paginatedMatches),
+          MatchPresenterMapper.groupMatchesByLeague(limitedMatches),
         stats,
-        filters,
-        totalCount,
-        page: currentPage,
-        perPage,
+        filters: { ...filters, date: dateFilter },
+        totalCount: mappedMatches.length,
+        page: 1,
+        perPage: initialVisible,
       });
     } catch (err) {
       const errorMessage =
@@ -264,8 +296,8 @@ export function useMatchesPresenter(
       try {
         const fallbackViewModel = await presenter.getViewModel(
           filters,
-          currentPage,
-          perPage
+          1,
+          INITIAL_BATCH_SIZE
         );
         const mappedMatches = fallbackViewModel.matches.map((match) =>
           MatchPresenterMapper.mapToMatch(match)
@@ -273,6 +305,8 @@ export function useMatchesPresenter(
         const mappedMatchesByLeague =
           MatchPresenterMapper.groupMatchesByLeague(mappedMatches);
 
+        setAllMatches(mappedMatches);
+        setVisibleCount(Math.min(mappedMatches.length, INITIAL_BATCH_SIZE));
         setViewModel({
           ...fallbackViewModel,
           matches: mappedMatches,
@@ -284,7 +318,7 @@ export function useMatchesPresenter(
     } finally {
       setLoading(false);
     }
-  }, [filters, currentPage, perPage]);
+  }, [filters, mapDomainMatchToPresenterMatch, mapStatusToViewStatus, today]);
 
   /**
    * Refresh data
@@ -296,17 +330,48 @@ export function useMatchesPresenter(
   /**
    * Set filters and reload data
    */
-  const setFilters = useCallback((newFilters: MatchFilters) => {
-    setFiltersState(newFilters);
-    setCurrentPageState(1); // Reset to first page when filters change
-  }, []);
+  const setFilters = useCallback(
+    (newFilters: MatchFilters) => {
+      const nextFilters = { ...newFilters };
+      if (!nextFilters.date || nextFilters.date.trim() === "") {
+        nextFilters.date = today;
+      }
+      setFiltersState(nextFilters);
+      setVisibleCount(INITIAL_BATCH_SIZE);
+    },
+    [today]
+  );
 
   /**
-   * Set current page
+   * Load more matches
    */
-  const setCurrentPage = useCallback((page: number) => {
-    setCurrentPageState(page);
-  }, []);
+  const loadMore = useCallback(() => {
+    setVisibleCount((prevVisible) => {
+      const total = allMatches.length;
+      if (total === 0) {
+        return prevVisible;
+      }
+
+      const nextVisible = Math.min(prevVisible + LOAD_MORE_STEP, total);
+      if (nextVisible === prevVisible) {
+        return prevVisible;
+      }
+
+      setViewModel((prev) => {
+        if (!prev) return prev;
+        const limitedMatches = allMatches.slice(0, nextVisible);
+        return {
+          ...prev,
+          matches: limitedMatches,
+          matchesByLeague:
+            MatchPresenterMapper.groupMatchesByLeague(limitedMatches),
+          perPage: nextVisible,
+        };
+      });
+
+      return nextVisible;
+    });
+  }, [allMatches]);
 
   /**
    * Reset all state
@@ -314,17 +379,18 @@ export function useMatchesPresenter(
   const reset = useCallback(() => {
     setLoading(false);
     setError(null);
-    setFiltersState({});
-    setCurrentPageState(1);
+    setFiltersState({ date: today });
+    setVisibleCount(INITIAL_BATCH_SIZE);
+    setAllMatches([]);
     setViewModel(null);
-  }, []);
+  }, [today]);
 
   /**
    * Load data
    */
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   // State object
   const state: MatchesPresenterState = {
@@ -332,14 +398,15 @@ export function useMatchesPresenter(
     loading,
     error,
     filters,
-    currentPage,
+    visibleCount,
+    hasMore: viewModel ? visibleCount < (viewModel.totalCount || 0) : false,
   };
 
   // Actions object
   const actions: MatchesPresenterActions = {
     refreshData,
     setFilters,
-    setCurrentPage,
+    loadMore,
     reset,
     setError,
   };

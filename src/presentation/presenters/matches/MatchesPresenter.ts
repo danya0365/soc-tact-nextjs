@@ -124,6 +124,46 @@ export class MatchPresenterMapper {
   static groupMatchesByLeague(matches: Match[]): LeagueMatches[] {
     const leagueMap = new Map<string, Match[]>();
 
+    const parseDate = (dateStr: string) => {
+      const parsed = new Date(dateStr);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const normalizeTime = (time: string | undefined) => time?.trim() ?? "";
+
+    const compareMatches = (a: Match, b: Match) => {
+      const dateA = parseDate(a.date);
+      const dateB = parseDate(b.date);
+
+      if (dateA && dateB && dateA.getTime() !== dateB.getTime()) {
+        return dateA.getTime() - dateB.getTime();
+      }
+
+      if (!dateA && dateB) return 1;
+      if (dateA && !dateB) return -1;
+
+      const timeA = normalizeTime(a.time);
+      const timeB = normalizeTime(b.time);
+
+      if (timeA && timeB && timeA !== timeB) {
+        return timeA.localeCompare(timeB, "th-TH", { numeric: true });
+      }
+
+      if (!timeA && timeB) return 1;
+      if (timeA && !timeB) return -1;
+
+      const homeCompare = a.homeTeam.name.localeCompare(b.homeTeam.name, "th-TH", {
+        sensitivity: "base",
+      });
+      if (homeCompare !== 0) {
+        return homeCompare;
+      }
+
+      return a.awayTeam.name.localeCompare(b.awayTeam.name, "th-TH", {
+        sensitivity: "base",
+      });
+    };
+
     // Group matches by league
     matches.forEach((match) => {
       if (!leagueMap.has(match.league.name)) {
@@ -133,9 +173,9 @@ export class MatchPresenterMapper {
     });
 
     // Convert map to array of LeagueMatches
-    return Array.from(leagueMap.entries()).map(([league, matches]) => ({
+    return Array.from(leagueMap.entries()).map(([league, leagueMatches]) => ({
       league,
-      matches,
+      matches: [...leagueMatches].sort(compareMatches),
     }));
   }
 }
@@ -151,7 +191,7 @@ export class MatchesPresenter {
   async getViewModel(
     filters: MatchFilters = {},
     page: number = 1,
-    perPage: number = 10
+    perPage: number = 100
   ): Promise<MatchesViewModel> {
     try {
       // Get filtered matches
