@@ -247,7 +247,12 @@ export class MatchesPresenter {
       return {
         matches: [],
         matchesByLeague: MatchPresenterMapper.groupMatchesByLeague([]),
-        stats,
+        stats: {
+          totalMatches: 0,
+          liveMatches: 0,
+          finishedMatches: 0,
+          upcomingMatches: 0,
+        },
         filters,
         totalCount,
         page,
