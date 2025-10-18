@@ -12,6 +12,7 @@ const presenter = LandingPresenterFactory.createClient();
 export interface LandingPresenterState {
   viewModel: LandingViewModel | null;
   loading: boolean;
+  loadingStandings: boolean;
   error: string | null;
   selectedLeague: number;
 }
@@ -33,6 +34,7 @@ export function useLandingPresenter(
     initialViewModel
   );
   const [loading, setLoading] = useState(false);
+  const [loadingStandings, setLoadingStandings] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedLeague, setSelectedLeague] = useState(
     LEAGUE_IDS.PREMIER_LEAGUE
@@ -46,7 +48,7 @@ export function useLandingPresenter(
    */
   const loadStandingsByLeague = useCallback(
     async (leagueId: number) => {
-      setLoading(true);
+      setLoadingStandings(true);
       setError(null);
 
       try {
@@ -70,7 +72,7 @@ export function useLandingPresenter(
         setError(errorMessage);
         console.error("Error loading standings:", err);
       } finally {
-        setLoading(false);
+        setLoadingStandings(false);
       }
     },
     [footballData]
@@ -82,6 +84,7 @@ export function useLandingPresenter(
    */
   const loadData = useCallback(async () => {
     setLoading(true);
+    setLoadingStandings(true);
     setError(null);
 
     try {
@@ -98,6 +101,9 @@ export function useLandingPresenter(
         LandingPresenterMapper.mapToLiveMatch(match)
       );
 
+      const mappedLiveMatchesByLeague =
+        LandingPresenterMapper.groupMatchesByLeague(mappedLiveMatches);
+
       const mappedStandings = standings.map((standing) =>
         LandingPresenterMapper.mapToLeagueStanding(standing)
       );
@@ -107,8 +113,8 @@ export function useLandingPresenter(
       // Replace API data with cached/fresh data from footballData
       setViewModel({
         ...viewModel,
-        liveMatches: viewModel?.liveMatches || mappedLiveMatches,
-        liveMatchesByLeague: viewModel?.liveMatchesByLeague || [],
+        liveMatches: mappedLiveMatches,
+        liveMatchesByLeague: mappedLiveMatchesByLeague,
         leagueStandings: mappedStandings,
         featuredPosts: newViewModel.featuredPosts,
         stats: {
@@ -125,6 +131,7 @@ export function useLandingPresenter(
       console.error("Error loading landing data:", err);
     } finally {
       setLoading(false);
+      setLoadingStandings(false);
     }
   }, [footballData, selectedLeague, viewModel]);
 
@@ -159,6 +166,7 @@ export function useLandingPresenter(
     {
       viewModel,
       loading,
+      loadingStandings,
       error,
       selectedLeague,
     },
