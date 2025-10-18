@@ -5,6 +5,7 @@ import { useLandingPresenter } from "@/src/presentation/presenters/landing/useLa
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { LandingLeagueTableSkeleton } from "./LandingLeagueTableSkeleton";
 
 interface LandingViewProps {
   initialViewModel?: LandingViewModel;
@@ -349,141 +350,144 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             </div>
           </div>
 
-          {/* League Table */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-green-600 text-white">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      #
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      ทีม
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      แข่ง
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      ชนะ
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      เสมอ
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      แพ้
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      +/-
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      คะแนน
-                    </th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">
-                      ฟอร์ม
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {viewModel.leagueStandings
-                    .slice(
-                      0,
-                      showAllTeams ? viewModel.leagueStandings.length : 6
-                    )
-                    .map((team) => (
-                      <tr
-                        key={team.position}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <td className="px-4 py-4 text-center font-bold text-gray-900 dark:text-gray-100">
-                          {team.position}
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            {team.logo.startsWith("http") ? (
-                              <Image
-                                src={team.logo}
-                                alt={team.team}
-                                width={24}
-                                height={24}
-                                className="object-contain"
-                              />
-                            ) : (
-                              <span className="text-2xl">{team.logo}</span>
-                            )}
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">
-                              {team.team}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                          {team.played}
-                        </td>
-                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                          {team.won}
-                        </td>
-                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                          {team.drawn}
-                        </td>
-                        <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
-                          {team.lost}
-                        </td>
-                        <td className="px-4 py-4 text-center font-semibold text-gray-900 dark:text-gray-100">
-                          {team.goalDifference > 0 ? "+" : ""}
-                          {team.goalDifference}
-                        </td>
-                        <td className="px-4 py-4 text-center font-bold text-green-600 text-lg">
-                          {team.points}
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex gap-1 justify-center">
-                            {team.form.map((result, idx) => (
-                              <div
-                                key={idx}
-                                className={`w-6 h-6 rounded-full ${getFormColor(
-                                  result
-                                )} flex items-center justify-center text-white text-xs font-bold`}
-                              >
-                                {result}
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-            {viewModel.leagueStandings.length > 6 && (
-              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-right">
-                <button
-                  onClick={() => setShowAllTeams(!showAllTeams)}
-                  className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                >
-                  {showAllTeams ? "แสดงน้อยลง" : "ดูทั้งหมด"}
-                  <svg
-                    className={`ml-1 w-4 h-4 transition-transform ${
-                      showAllTeams ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
+          {state.loadingStandings ? (
+            <LandingLeagueTableSkeleton />
+          ) : (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-green-600 text-white">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">
+                        #
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">
+                        ทีม
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        แข่ง
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        ชนะ
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        เสมอ
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        แพ้
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        +/-
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        คะแนน
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">
+                        ฟอร์ม
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {viewModel.leagueStandings
+                      .slice(
+                        0,
+                        showAllTeams ? viewModel.leagueStandings.length : 6
+                      )
+                      .map((team) => (
+                        <tr
+                          key={team.position}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <td className="px-4 py-4 text-center font-bold text-gray-900 dark:text-gray-100">
+                            {team.position}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
+                              {team.logo.startsWith("http") ? (
+                                <Image
+                                  src={team.logo}
+                                  alt={team.team}
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
+                                />
+                              ) : (
+                                <span className="text-2xl">{team.logo}</span>
+                              )}
+                              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                {team.team}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                            {team.played}
+                          </td>
+                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                            {team.won}
+                          </td>
+                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                            {team.drawn}
+                          </td>
+                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-400">
+                            {team.lost}
+                          </td>
+                          <td className="px-4 py-4 text-center font-semibold text-gray-900 dark:text-gray-100">
+                            {team.goalDifference > 0 ? "+" : ""}
+                            {team.goalDifference}
+                          </td>
+                          <td className="px-4 py-4 text-center font-bold text-green-600 text-lg">
+                            {team.points}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex gap-1 justify-center">
+                              {team.form.map((result, idx) => (
+                                <div
+                                  key={idx}
+                                  className={`w-6 h-6 rounded-full ${getFormColor(
+                                    result
+                                  )} flex items-center justify-center text-white text-xs font-bold`}
+                                >
+                                  {result}
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </div>
+              {viewModel.leagueStandings.length > 6 && (
+                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-right">
+                  <button
+                    onClick={() => setShowAllTeams(!showAllTeams)}
+                    className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+                  >
+                    {showAllTeams ? "แสดงน้อยลง" : "ดูทั้งหมด"}
+                    <svg
+                      className={`ml-1 w-4 h-4 transition-transform ${
+                        showAllTeams ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
-        {/* Featured Posts Section */}
+        {/* Tactics Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
