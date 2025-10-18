@@ -131,7 +131,7 @@ export const mockMatches: MockMatch[] = [
     league: {
       id: "league-001",
       name: "Premier League",
-      logo: "🏴󐁧󐁢󐁥󐁮󐁧󐁿",
+      logo: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       country: "England",
     },
     venue: {
@@ -166,7 +166,7 @@ export const mockMatches: MockMatch[] = [
     league: {
       id: "league-001",
       name: "Premier League",
-      logo: "🏴󐁧󐁢󐁥󐁮󐁧󐁿",
+      logo: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       country: "England",
     },
     venue: {
@@ -336,7 +336,7 @@ export const mockMatches: MockMatch[] = [
     league: {
       id: "league-001",
       name: "Premier League",
-      logo: "🏴󐁧󐁢󐁥󐁮󐁧󐁿",
+      logo: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       country: "England",
     },
     venue: {
@@ -533,9 +533,7 @@ export function getMatchDetailById(id: string): MockMatchDetail | undefined {
   return mockMatchDetails[id];
 }
 
-export function getMatchesByStatus(
-  status: MockMatch["status"]
-): MockMatch[] {
+export function getMatchesByStatus(status: MockMatch["status"]): MockMatch[] {
   return mockMatches.filter((match) => match.status === status);
 }
 
