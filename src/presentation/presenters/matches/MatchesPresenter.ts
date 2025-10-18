@@ -1,7 +1,6 @@
 /**
  * Matches Presenter
  * Handles business logic for the Matches page
- * Uses mock data for UI development
  */
 
 import {
@@ -152,9 +151,13 @@ export class MatchPresenterMapper {
       if (!timeA && timeB) return 1;
       if (timeA && !timeB) return -1;
 
-      const homeCompare = a.homeTeam.name.localeCompare(b.homeTeam.name, "th-TH", {
-        sensitivity: "base",
-      });
+      const homeCompare = a.homeTeam.name.localeCompare(
+        b.homeTeam.name,
+        "th-TH",
+        {
+          sensitivity: "base",
+        }
+      );
       if (homeCompare !== 0) {
         return homeCompare;
       }
@@ -242,9 +245,8 @@ export class MatchesPresenter {
       const paginatedMatches = filteredMatches.slice(startIndex, endIndex);
 
       return {
-        matches: paginatedMatches,
-        matchesByLeague:
-          MatchPresenterMapper.groupMatchesByLeague(paginatedMatches),
+        matches: [],
+        matchesByLeague: MatchPresenterMapper.groupMatchesByLeague([]),
         stats,
         filters,
         totalCount,

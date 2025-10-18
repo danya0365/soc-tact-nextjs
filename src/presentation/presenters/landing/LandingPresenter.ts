@@ -217,7 +217,7 @@ export class LandingPresenter {
       const stats: LandingStats = {
         totalPosts: 1247,
         totalUsers: 8934,
-        totalMatches: 156,
+        totalMatches: 0,
         totalLeagues: 12,
       };
 
@@ -240,9 +240,8 @@ export class LandingPresenter {
       const popularLeagues = await this.getPopularLeagues();
 
       return {
-        liveMatches,
-        liveMatchesByLeague:
-          LandingPresenterMapper.groupMatchesByLeague(liveMatches),
+        liveMatches: [],
+        liveMatchesByLeague: LandingPresenterMapper.groupMatchesByLeague([]),
         leagueStandings: [],
         featuredPosts,
         stats,

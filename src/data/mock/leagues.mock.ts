@@ -57,7 +57,7 @@ export const mockLeagues: MockLeague[] = [
   {
     id: "league-001",
     name: "Premier League",
-    logo: "🏴󐁧󐁢󐁥󐁮󐁧󐁿",
+    logo: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
     country: "England",
     season: "2024/25",
     totalTeams: 20,
