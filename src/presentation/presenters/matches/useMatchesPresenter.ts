@@ -300,6 +300,10 @@ export function useMatchesPresenter(
       const initialVisible = Math.min(mappedMatches.length, INITIAL_BATCH_SIZE);
       const limitedMatches = mappedMatches.slice(0, initialVisible);
 
+      const groupedMatches = MatchPresenterMapper.groupMatchesByStatusAndLeague(
+        limitedMatches
+      );
+
       const stats = {
         totalMatches: mappedMatches.length,
         liveMatches: mappedMatches.filter((match) => match.status === "live")
@@ -318,6 +322,7 @@ export function useMatchesPresenter(
         matches: limitedMatches,
         matchesByLeague:
           MatchPresenterMapper.groupMatchesByLeague(limitedMatches),
+        groupedMatches,
         stats,
         filters: { ...filters, date: dateFilter },
         totalCount: mappedMatches.length,
@@ -336,18 +341,19 @@ export function useMatchesPresenter(
           1,
           INITIAL_BATCH_SIZE
         );
-        const mappedMatches = fallbackViewModel.matches.map((match) =>
-          MatchPresenterMapper.mapToMatch(match)
-        );
+        const fallbackMatches = fallbackViewModel.matches;
         const mappedMatchesByLeague =
-          MatchPresenterMapper.groupMatchesByLeague(mappedMatches);
+          MatchPresenterMapper.groupMatchesByLeague(fallbackMatches);
+        const mappedGroupedMatches =
+          MatchPresenterMapper.groupMatchesByStatusAndLeague(fallbackMatches);
 
-        setAllMatches(mappedMatches);
-        setVisibleCount(Math.min(mappedMatches.length, INITIAL_BATCH_SIZE));
+        setAllMatches(fallbackMatches);
+        setVisibleCount(Math.min(fallbackMatches.length, INITIAL_BATCH_SIZE));
         setViewModel({
           ...fallbackViewModel,
-          matches: mappedMatches,
+          matches: fallbackMatches,
           matchesByLeague: mappedMatchesByLeague,
+          groupedMatches: mappedGroupedMatches,
         });
       } catch (fallbackError) {
         console.error("Fallback matches data failed:", fallbackError);
@@ -397,11 +403,14 @@ export function useMatchesPresenter(
       setViewModel((prev) => {
         if (!prev) return prev;
         const limitedMatches = allMatches.slice(0, nextVisible);
+        const groupedMatches =
+          MatchPresenterMapper.groupMatchesByStatusAndLeague(limitedMatches);
         return {
           ...prev,
           matches: limitedMatches,
           matchesByLeague:
             MatchPresenterMapper.groupMatchesByLeague(limitedMatches),
+          groupedMatches,
           perPage: nextVisible,
         };
       });

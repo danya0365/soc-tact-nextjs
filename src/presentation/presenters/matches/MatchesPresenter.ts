@@ -66,6 +66,7 @@ export interface MatchFilters {
 export interface MatchesViewModel {
   matches: Match[];
   matchesByLeague: LeagueMatches[];
+  groupedMatches: StatusGroupedMatches[];
   stats: MatchStats;
   filters: MatchFilters;
   totalCount: number;
@@ -76,6 +77,11 @@ export interface MatchesViewModel {
 export interface LeagueMatches {
   league: string;
   matches: Match[];
+}
+
+export interface StatusGroupedMatches {
+  status: "live" | "upcoming" | "finished";
+  leagues: LeagueMatches[];
 }
 
 export class MatchPresenterMapper {
@@ -181,6 +187,48 @@ export class MatchPresenterMapper {
       matches: [...leagueMatches].sort(compareMatches),
     }));
   }
+
+  static groupMatchesByStatusAndLeague(matches: Match[]): StatusGroupedMatches[] {
+    const statusOrder: Array<StatusGroupedMatches["status"]> = [
+      "live",
+      "upcoming",
+      "finished",
+    ];
+
+    const statusBuckets = new Map<StatusGroupedMatches["status"], Match[]>();
+
+    const normalizeStatus = (status: Match["status"]): StatusGroupedMatches["status"] => {
+      switch (status) {
+        case "live":
+          return "live";
+        case "finished":
+          return "finished";
+        default:
+          return "upcoming";
+      }
+    };
+
+    matches.forEach((match) => {
+      const statusKey = normalizeStatus(match.status);
+      if (!statusBuckets.has(statusKey)) {
+        statusBuckets.set(statusKey, []);
+      }
+      statusBuckets.get(statusKey)?.push(match);
+    });
+
+    return statusOrder
+      .map((status) => {
+        const statusMatches = statusBuckets.get(status) ?? [];
+        if (statusMatches.length === 0) {
+          return null;
+        }
+        return {
+          status,
+          leagues: MatchPresenterMapper.groupMatchesByLeague(statusMatches),
+        };
+      })
+      .filter((group): group is StatusGroupedMatches => Boolean(group));
+  }
 }
 
 /**
@@ -230,29 +278,34 @@ export class MatchesPresenter {
         );
       }
 
-      // Calculate stats
-      const stats: MatchStats = {
-        totalMatches: mockMatches.length,
-        liveMatches: getMatchesByStatus("live").length,
-        finishedMatches: getMatchesByStatus("finished").length,
-        upcomingMatches: getMatchesByStatus("upcoming").length,
-      };
-
       // Pagination
       const totalCount = filteredMatches.length;
       const startIndex = (page - 1) * perPage;
       const endIndex = startIndex + perPage;
       const paginatedMatches = filteredMatches.slice(startIndex, endIndex);
 
+      const mappedMatches = paginatedMatches.map((match) =>
+        MatchPresenterMapper.mapToMatch(match)
+      );
+
+      const stats: MatchStats = {
+        totalMatches: filteredMatches.length,
+        liveMatches: filteredMatches.filter((match) => match.status === "live")
+          .length,
+        finishedMatches: filteredMatches.filter(
+          (match) => match.status === "finished"
+        ).length,
+        upcomingMatches: filteredMatches.filter(
+          (match) => match.status === "upcoming"
+        ).length,
+      };
+
       return {
-        matches: [],
-        matchesByLeague: MatchPresenterMapper.groupMatchesByLeague([]),
-        stats: {
-          totalMatches: 0,
-          liveMatches: 0,
-          finishedMatches: 0,
-          upcomingMatches: 0,
-        },
+        matches: mappedMatches,
+        matchesByLeague: MatchPresenterMapper.groupMatchesByLeague(mappedMatches),
+        groupedMatches:
+          MatchPresenterMapper.groupMatchesByStatusAndLeague(mappedMatches),
+        stats,
         filters,
         totalCount,
         page,

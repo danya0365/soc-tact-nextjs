@@ -63,6 +63,18 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
     return timeString;
   };
 
+  const getStatusSectionTitle = (status: "live" | "upcoming" | "finished") => {
+    switch (status) {
+      case "live":
+        return "กำลังแข่ง";
+      case "upcoming":
+        return "ยังไม่เริ่ม";
+      case "finished":
+      default:
+        return "จบการแข่งขัน";
+    }
+  };
+
   // Show loading only on initial load
   if (state.loading && !viewModel?.matches.length) {
     return <MatchesViewSkeleton />;
@@ -94,6 +106,8 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
       </div>
     );
   }
+
+  const groupedMatches = viewModel.groupedMatches ?? [];
 
   // No data state
   if (!viewModel) {
@@ -260,8 +274,8 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
         </div>
 
         {/* Matches List */}
-        <div className="space-y-6">
-          {viewModel.matches.length === 0 ? (
+        <div className="space-y-10">
+          {groupedMatches.length === 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
               <div className="text-gray-400 text-6xl mb-4">⚽</div>
               <p className="text-gray-600 dark:text-gray-400 font-medium mb-2">
@@ -272,154 +286,166 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
               </p>
             </div>
           ) : (
-            viewModel.matchesByLeague.map((leagueGroup) => {
-              const leagueInfo = leagueGroup.matches[0]?.league;
-              return (
-                <div key={leagueGroup.league} className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      {leagueInfo?.logo && (
-                        <>
-                          {leagueInfo.logo.startsWith("http") ? (
-                            <Image
-                              src={leagueInfo.logo}
-                              alt={leagueInfo.name}
-                              width={24}
-                              height={24}
-                              className="object-contain"
-                            />
-                          ) : (
-                            <span className="text-xl">{leagueInfo.logo}</span>
-                          )}
-                        </>
-                      )}
-                      <div>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                          {leagueGroup.league}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {leagueGroup.matches.length} นัดแข่งขัน
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+            groupedMatches.map((statusGroup) => (
+              <div key={statusGroup.status} className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {getStatusSectionTitle(statusGroup.status)}
+                  </h2>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                      statusGroup.status
+                    )}`}
+                  >
+                    {getStatusSectionTitle(statusGroup.status)}
+                  </span>
+                </div>
 
-                  <div className="space-y-4">
-                    {leagueGroup.matches.map((match) => (
-                      <Link
-                        key={match.id}
-                        href={`/matches/${match.id}`}
-                        className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
-                      >
-                        <div className="flex items-center justify-between mb-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                              match.status
-                            )}`}
-                          >
-                            {match.status === "live" && match.minute
-                              ? `${match.minute}'`
-                              : getStatusText(match.status)}
-                          </span>
-                          <span className="hidden">
-                            Debug: {match.status} {match.minute}{" "}
-                            {getStatusText(match.status)}
-                          </span>
-                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {match.league.country}
-                          </span>
+                <div className="space-y-6">
+                  {statusGroup.leagues.map((leagueGroup) => {
+                    const leagueInfo = leagueGroup.matches[0]?.league;
+                    return (
+                      <div key={`${statusGroup.status}-${leagueGroup.league}`} className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            {leagueInfo?.logo && (
+                              <>
+                                {leagueInfo.logo.startsWith("http") ? (
+                                  <Image
+                                    src={leagueInfo.logo}
+                                    alt={leagueInfo.name}
+                                    width={24}
+                                    height={24}
+                                    className="object-contain"
+                                  />
+                                ) : (
+                                  <span className="text-xl">{leagueInfo.logo}</span>
+                                )}
+                              </>
+                            )}
+                            <div>
+                              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                {leagueGroup.league}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {leagueGroup.matches.length} นัดแข่งขัน
+                              </p>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4 items-center">
-                          {/* Home Team */}
-                          <div className="text-right">
-                            <div className="flex items-center justify-end space-x-2 mb-1">
-                              <span className="font-semibold text-gray-900 dark:text-gray-100">
-                                {match.homeTeam.name}
-                              </span>
-                              {match.homeTeam.logo.startsWith("http") ? (
-                                <Image
-                                  src={match.homeTeam.logo}
-                                  alt={match.homeTeam.name}
-                                  width={24}
-                                  height={24}
-                                  className="object-contain"
-                                />
-                              ) : (
-                                <span className="text-2xl">
-                                  {match.homeTeam.logo}
+                        <div className="space-y-4">
+                          {leagueGroup.matches.map((match) => (
+                            <Link
+                              key={match.id}
+                              href={`/matches/${match.id}`}
+                              className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                            >
+                              <div className="flex items-center justify-between mb-4">
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                                    match.status
+                                  )}`}
+                                >
+                                  {match.status === "live" && match.minute
+                                    ? `${match.minute}'`
+                                    : getStatusText(match.status)}
                                 </span>
-                              )}
-                            </div>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {match.homeTeam.shortName}
-                            </span>
-                          </div>
+                                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                  {match.league.country}
+                                </span>
+                              </div>
 
-                          {/* Score */}
-                          <div className="text-center">
-                            {match.status === "upcoming" ? (
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                <div>{formatDate(match.date)}</div>
-                                <div className="font-semibold">
-                                  {formatTime(match.time)}
+                              <div className="grid grid-cols-3 gap-4 items-center">
+                                <div className="text-right">
+                                  <div className="flex items-center justify-end space-x-2 mb-1">
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                      {match.homeTeam.name}
+                                    </span>
+                                    {match.homeTeam.logo.startsWith("http") ? (
+                                      <Image
+                                        src={match.homeTeam.logo}
+                                        alt={match.homeTeam.name}
+                                        width={24}
+                                        height={24}
+                                        className="object-contain"
+                                      />
+                                    ) : (
+                                      <span className="text-2xl">
+                                        {match.homeTeam.logo}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {match.homeTeam.shortName}
+                                  </span>
+                                </div>
+
+                                <div className="text-center">
+                                  {match.status === "upcoming" ? (
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                      <div>{formatDate(match.date)}</div>
+                                      <div className="font-semibold">
+                                        {formatTime(match.time)}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                                      {match.score.home} - {match.score.away}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="text-left">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    {match.awayTeam.logo.startsWith("http") ? (
+                                      <Image
+                                        src={match.awayTeam.logo}
+                                        alt={match.awayTeam.name}
+                                        width={24}
+                                        height={24}
+                                        className="object-contain"
+                                      />
+                                    ) : (
+                                      <span className="text-2xl">
+                                        {match.awayTeam.logo}
+                                      </span>
+                                    )}
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                      {match.awayTeam.name}
+                                    </span>
+                                  </div>
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {match.awayTeam.shortName}
+                                  </span>
                                 </div>
                               </div>
-                            ) : (
-                              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                {match.score.home} - {match.score.away}
-                              </div>
-                            )}
-                          </div>
 
-                          {/* Away Team */}
-                          <div className="text-left">
-                            <div className="flex items-center space-x-2 mb-1">
-                              {match.awayTeam.logo.startsWith("http") ? (
-                                <Image
-                                  src={match.awayTeam.logo}
-                                  alt={match.awayTeam.name}
-                                  width={24}
-                                  height={24}
-                                  className="object-contain"
-                                />
-                              ) : (
-                                <span className="text-2xl">
-                                  {match.awayTeam.logo}
-                                </span>
-                              )}
-                              <span className="font-semibold text-gray-900 dark:text-gray-100">
-                                {match.awayTeam.name}
-                              </span>
-                            </div>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {match.awayTeam.shortName}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                            <div className="flex items-center space-x-4">
-                              <span>📍 {match.venue.name}</span>
-                              {match.referee && <span>👨‍⚖️ {match.referee}</span>}
-                            </div>
-                            {match.status !== "upcoming" && (
-                              <div className="flex items-center space-x-2">
-                                <span>{formatDate(match.date)}</span>
-                                <span className="font-semibold">
-                                  {formatTime(match.time)}
-                                </span>
+                              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="flex items-center space-x-4">
+                                    <span>📍 {match.venue.name}</span>
+                                    {match.referee && <span>👨‍⚖️ {match.referee}</span>}
+                                  </div>
+                                  {match.status !== "upcoming" && (
+                                    <div className="flex items-center space-x-2">
+                                      <span>{formatDate(match.date)}</span>
+                                      <span className="font-semibold">
+                                        {formatTime(match.time)}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            )}
-                          </div>
+                            </Link>
+                          ))}
                         </div>
-                      </Link>
-                    ))}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })
+              </div>
+            ))
           )}
         </div>
 
