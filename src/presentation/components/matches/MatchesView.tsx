@@ -321,6 +321,10 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                               ? `${match.minute}'`
                               : getStatusText(match.status)}
                           </span>
+                          <span className="hidden">
+                            Debug: {match.status} {match.minute}{" "}
+                            {getStatusText(match.status)}
+                          </span>
                           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                             {match.league.country}
                           </span>
@@ -401,7 +405,12 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                               {match.referee && <span>👨‍⚖️ {match.referee}</span>}
                             </div>
                             {match.status !== "upcoming" && (
-                              <span>{formatDate(match.date)}</span>
+                              <div className="flex items-center space-x-2">
+                                <span>{formatDate(match.date)}</span>
+                                <span className="font-semibold">
+                                  {formatTime(match.time)}
+                                </span>
+                              </div>
                             )}
                           </div>
                         </div>
