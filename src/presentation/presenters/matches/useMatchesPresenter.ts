@@ -131,6 +131,43 @@ export function useMatchesPresenter(
 
         const kickoffDate = hasValidDate ? sourceDate : new Date();
 
+        const calculateMatchMinute = (): number | null => {
+          if (typeof match.minute === "number" && !Number.isNaN(match.minute)) {
+            return Math.max(match.minute, 0);
+          }
+
+          if (!hasValidDate) {
+            return null;
+          }
+
+          const activeStatuses = new Set<DomainMatch["status"]>([
+            MatchStatus.LIVE,
+            MatchStatus.IN_PLAY,
+            MatchStatus.PAUSED,
+          ]);
+
+          if (!activeStatuses.has(match.status)) {
+            return null;
+          }
+
+          const diffMs = Date.now() - kickoffDate.getTime();
+          if (diffMs <= 0) {
+            return 0;
+          }
+
+          let calculatedMinute = Math.floor(diffMs / 60000);
+
+          if (
+            match.status === MatchStatus.PAUSED &&
+            calculatedMinute > 45 &&
+            calculatedMinute <= 60
+          ) {
+            calculatedMinute = 45;
+          }
+
+          return Math.min(calculatedMinute, 130);
+        };
+
         const formattedDate = kickoffDate.toISOString();
         const formattedTime = kickoffDate.toLocaleTimeString("th-TH", {
           hour: "2-digit",
@@ -154,7 +191,7 @@ export function useMatchesPresenter(
               : undefined,
           },
           status: viewStatus,
-          minute: match.minute ?? null,
+          minute: calculateMatchMinute(),
           league: {
             id: match.league.id.toString(),
             name: match.league.name,
