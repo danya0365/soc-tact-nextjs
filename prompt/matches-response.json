@@ -1,0 +1,957 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 535220,
+      "date": "2025-10-19T00:00:00Z",
+      "timestamp": 1760832000000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 1771,
+        "name": "Cruzeiro EC",
+        "shortName": "Cruzeiro",
+        "logo": "https://crests.football-data.org/1771.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 3984,
+        "name": "Fortaleza EC",
+        "shortName": "Fortaleza",
+        "logo": "https://crests.football-data.org/3984.png",
+        "country": ""
+      },
+      "score": {
+        "home": 1,
+        "away": 0,
+        "halftime": { "home": 1, "away": 0 },
+        "fulltime": { "home": 1, "away": 0 }
+      },
+      "league": {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "country": "",
+        "logo": "https://crests.football-data.org/bsa.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 537520,
+      "date": "2025-10-19T10:15:00Z",
+      "timestamp": 1760868900000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 1912,
+        "name": "Telstar 1963",
+        "shortName": "Telstar",
+        "logo": "https://crests.football-data.org/1912.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 673,
+        "name": "SC Heerenveen",
+        "shortName": "Heerenveen",
+        "logo": "https://crests.football-data.org/673.png",
+        "country": ""
+      },
+      "score": {
+        "home": 2,
+        "away": 3,
+        "halftime": { "home": 1, "away": 2 },
+        "fulltime": { "home": 2, "away": 3 }
+      },
+      "league": {
+        "id": 2003,
+        "name": "Eredivisie",
+        "country": "",
+        "logo": "https://crests.football-data.org/ED.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 536880,
+      "date": "2025-10-19T10:30:00Z",
+      "timestamp": 1760869800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 7397,
+        "name": "Como 1907",
+        "shortName": "Como 1907",
+        "logo": "https://crests.football-data.org/7397.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 109,
+        "name": "Juventus FC",
+        "shortName": "Juventus",
+        "logo": "https://crests.football-data.org/109.png",
+        "country": ""
+      },
+      "score": {
+        "home": 2,
+        "away": 0,
+        "halftime": { "home": 1, "away": 0 },
+        "fulltime": { "home": 2, "away": 0 }
+      },
+      "league": {
+        "id": 2019,
+        "name": "Serie A",
+        "country": "",
+        "logo": "https://crests.football-data.org/SA.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 544297,
+      "date": "2025-10-19T12:00:00Z",
+      "timestamp": 1760875200000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 285,
+        "name": "Elche CF",
+        "shortName": "Elche",
+        "logo": "https://crests.football-data.org/285.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 77,
+        "name": "Athletic Club",
+        "shortName": "Athletic",
+        "logo": "https://crests.football-data.org/77.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 0,
+        "halftime": { "home": 0, "away": 0 },
+        "fulltime": { "home": 0, "away": 0 }
+      },
+      "league": {
+        "id": 2014,
+        "name": "Primera Division",
+        "country": "",
+        "logo": "https://crests.football-data.org/laliga.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 537519,
+      "date": "2025-10-19T12:30:00Z",
+      "timestamp": 1760877000000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 670,
+        "name": "SBV Excelsior",
+        "shortName": "Excelsior",
+        "logo": "https://crests.football-data.org/670.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1920,
+        "name": "Fortuna Sittard",
+        "shortName": "Sittard",
+        "logo": "https://crests.football-data.org/1920.png",
+        "country": ""
+      },
+      "score": {
+        "home": 1,
+        "away": 0,
+        "halftime": { "home": 1, "away": 0 },
+        "fulltime": { "home": 1, "away": 0 }
+      },
+      "league": {
+        "id": 2003,
+        "name": "Eredivisie",
+        "country": "",
+        "logo": "https://crests.football-data.org/ED.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 537518,
+      "date": "2025-10-19T12:30:00Z",
+      "timestamp": 1760877000000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 677,
+        "name": "FC Groningen",
+        "shortName": "Groningen",
+        "logo": "https://crests.football-data.org/677.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 6806,
+        "name": "Sparta Rotterdam",
+        "shortName": "Sparta",
+        "logo": "https://crests.football-data.org/6806.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 2,
+        "halftime": { "home": 0, "away": 1 },
+        "fulltime": { "home": 0, "away": 2 }
+      },
+      "league": {
+        "id": 2003,
+        "name": "Eredivisie",
+        "country": "",
+        "logo": "https://crests.football-data.org/ED.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 536878,
+      "date": "2025-10-19T13:00:00Z",
+      "timestamp": 1760878800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 104,
+        "name": "Cagliari Calcio",
+        "shortName": "Cagliari",
+        "logo": "https://crests.football-data.org/104.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 103,
+        "name": "Bologna FC 1909",
+        "shortName": "Bologna",
+        "logo": "https://crests.football-data.org/103.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 2,
+        "halftime": { "home": 0, "away": 1 },
+        "fulltime": { "home": 0, "away": 2 }
+      },
+      "league": {
+        "id": 2019,
+        "name": "Serie A",
+        "country": "",
+        "logo": "https://crests.football-data.org/SA.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 542475,
+      "date": "2025-10-19T13:00:00Z",
+      "timestamp": 1760878800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 546,
+        "name": "Racing Club de Lens",
+        "shortName": "RC Lens",
+        "logo": "https://crests.football-data.org/546.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1045,
+        "name": "Paris FC",
+        "shortName": "Paris FC",
+        "logo": "https://crests.football-data.org/1045.png",
+        "country": ""
+      },
+      "score": {
+        "home": 2,
+        "away": 1,
+        "halftime": { "home": 1, "away": 1 },
+        "fulltime": { "home": 2, "away": 1 }
+      },
+      "league": {
+        "id": 2015,
+        "name": "Ligue 1",
+        "country": "",
+        "logo": "https://crests.football-data.org/FL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 537863,
+      "date": "2025-10-19T13:00:00Z",
+      "timestamp": 1760878800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 73,
+        "name": "Tottenham Hotspur FC",
+        "shortName": "Tottenham",
+        "logo": "https://crests.football-data.org/73.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 58,
+        "name": "Aston Villa FC",
+        "shortName": "Aston Villa",
+        "logo": "https://crests.football-data.org/58.png",
+        "country": ""
+      },
+      "score": {
+        "home": 1,
+        "away": 2,
+        "halftime": { "home": 1, "away": 1 },
+        "fulltime": { "home": 1, "away": 2 }
+      },
+      "league": {
+        "id": 2021,
+        "name": "Premier League",
+        "country": "",
+        "logo": "https://crests.football-data.org/PL.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 536879,
+      "date": "2025-10-19T13:00:00Z",
+      "timestamp": 1760878800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 107,
+        "name": "Genoa CFC",
+        "shortName": "Genoa",
+        "logo": "https://crests.football-data.org/107.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 112,
+        "name": "Parma Calcio 1913",
+        "shortName": "Parma",
+        "logo": "https://crests.football-data.org/112.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 0,
+        "halftime": { "home": 0, "away": 0 },
+        "fulltime": { "home": 0, "away": 0 }
+      },
+      "league": {
+        "id": 2019,
+        "name": "Serie A",
+        "country": "",
+        "logo": "https://crests.football-data.org/SA.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 540461,
+      "date": "2025-10-19T13:30:00Z",
+      "timestamp": 1760880600000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 17,
+        "name": "SC Freiburg",
+        "shortName": "Freiburg",
+        "logo": "https://crests.football-data.org/17.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 19,
+        "name": "Eintracht Frankfurt",
+        "shortName": "Frankfurt",
+        "logo": "https://crests.football-data.org/19.png",
+        "country": ""
+      },
+      "score": {
+        "home": 2,
+        "away": 2,
+        "halftime": { "home": 1, "away": 2 },
+        "fulltime": { "home": 2, "away": 2 }
+      },
+      "league": {
+        "id": 2002,
+        "name": "Bundesliga",
+        "country": "",
+        "logo": "https://crests.football-data.org/BL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 544294,
+      "date": "2025-10-19T14:15:00Z",
+      "timestamp": 1760883300000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 558,
+        "name": "RC Celta de Vigo",
+        "shortName": "Celta",
+        "logo": "https://crests.football-data.org/558.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 92,
+        "name": "Real Sociedad de Fútbol",
+        "shortName": "Real Sociedad",
+        "logo": "https://crests.football-data.org/92.png",
+        "country": ""
+      },
+      "score": {
+        "home": 1,
+        "away": 1,
+        "halftime": { "home": 1, "away": 0 },
+        "fulltime": { "home": 1, "away": 1 }
+      },
+      "league": {
+        "id": 2014,
+        "name": "Primera Division",
+        "country": "",
+        "logo": "https://crests.football-data.org/laliga.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 537513,
+      "date": "2025-10-19T14:45:00Z",
+      "timestamp": 1760885100000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 671,
+        "name": "Heracles Almelo",
+        "shortName": "Heracles",
+        "logo": "https://crests.football-data.org/671.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 675,
+        "name": "Feyenoord Rotterdam",
+        "shortName": "Feyenoord",
+        "logo": "https://crests.football-data.org/675.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 7,
+        "halftime": { "home": 0, "away": 4 },
+        "fulltime": { "home": 0, "away": 7 }
+      },
+      "league": {
+        "id": 2003,
+        "name": "Eredivisie",
+        "country": "",
+        "logo": "https://crests.football-data.org/ED.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 542477,
+      "date": "2025-10-19T15:15:00Z",
+      "timestamp": 1760886900000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 529,
+        "name": "Stade Rennais FC 1901",
+        "shortName": "Stade Rennais",
+        "logo": "https://crests.football-data.org/529.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 519,
+        "name": "AJ Auxerre",
+        "shortName": "Auxerre",
+        "logo": "https://crests.football-data.org/519.png",
+        "country": ""
+      },
+      "score": {
+        "home": 2,
+        "away": 2,
+        "halftime": { "home": 1, "away": 1 },
+        "fulltime": { "home": 2, "away": 2 }
+      },
+      "league": {
+        "id": 2015,
+        "name": "Ligue 1",
+        "country": "",
+        "logo": "https://crests.football-data.org/FL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 542469,
+      "date": "2025-10-19T15:15:00Z",
+      "timestamp": 1760886900000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 525,
+        "name": "FC Lorient",
+        "shortName": "Lorient",
+        "logo": "https://crests.football-data.org/525.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 512,
+        "name": "Stade Brestois 29",
+        "shortName": "Brest",
+        "logo": "https://crests.football-data.org/512.png",
+        "country": ""
+      },
+      "score": {
+        "home": 3,
+        "away": 3,
+        "halftime": { "home": 1, "away": 2 },
+        "fulltime": { "home": 3, "away": 3 }
+      },
+      "league": {
+        "id": 2015,
+        "name": "Ligue 1",
+        "country": "",
+        "logo": "https://crests.football-data.org/FL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 542471,
+      "date": "2025-10-19T15:15:00Z",
+      "timestamp": 1760886900000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 511,
+        "name": "Toulouse FC",
+        "shortName": "Toulouse",
+        "logo": "https://crests.football-data.org/511.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 545,
+        "name": "FC Metz",
+        "shortName": "FC Metz",
+        "logo": "https://crests.football-data.org/545.png",
+        "country": ""
+      },
+      "score": {
+        "home": 4,
+        "away": 0,
+        "halftime": { "home": 2, "away": 0 },
+        "fulltime": { "home": 4, "away": 0 }
+      },
+      "league": {
+        "id": 2015,
+        "name": "Ligue 1",
+        "country": "",
+        "logo": "https://crests.football-data.org/FL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 537860,
+      "date": "2025-10-19T15:30:00Z",
+      "timestamp": 1760887800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 64,
+        "name": "Liverpool FC",
+        "shortName": "Liverpool",
+        "logo": "https://crests.football-data.org/64.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 66,
+        "name": "Manchester United FC",
+        "shortName": "Man United",
+        "logo": "https://crests.football-data.org/66.png",
+        "country": ""
+      },
+      "score": {
+        "home": 1,
+        "away": 2,
+        "halftime": { "home": 0, "away": 1 },
+        "fulltime": { "home": 1, "away": 2 }
+      },
+      "league": {
+        "id": 2021,
+        "name": "Premier League",
+        "country": "",
+        "logo": "https://crests.football-data.org/PL.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 540466,
+      "date": "2025-10-19T15:30:00Z",
+      "timestamp": 1760887800000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 20,
+        "name": "FC St. Pauli 1910",
+        "shortName": "St. Pauli",
+        "logo": "https://crests.football-data.org/20.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 2,
+        "name": "TSG 1899 Hoffenheim",
+        "shortName": "Hoffenheim",
+        "logo": "https://crests.football-data.org/2.png",
+        "country": ""
+      },
+      "score": {
+        "home": 1,
+        "away": 3,
+        "halftime": { "home": 0, "away": 0 },
+        "fulltime": { "home": 1, "away": 3 }
+      },
+      "league": {
+        "id": 2002,
+        "name": "Bundesliga",
+        "country": "",
+        "logo": "https://crests.football-data.org/BL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 536877,
+      "date": "2025-10-19T16:00:00Z",
+      "timestamp": 1760889600000,
+      "status": "finished",
+      "homeTeam": {
+        "id": 102,
+        "name": "Atalanta BC",
+        "shortName": "Atalanta",
+        "logo": "https://crests.football-data.org/102.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 110,
+        "name": "SS Lazio",
+        "shortName": "Lazio",
+        "logo": "https://crests.football-data.org/110.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 0,
+        "halftime": { "home": 0, "away": 0 },
+        "fulltime": { "home": 0, "away": 0 }
+      },
+      "league": {
+        "id": 2019,
+        "name": "Serie A",
+        "country": "",
+        "logo": "https://crests.football-data.org/SA.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 544296,
+      "date": "2025-10-19T16:30:00Z",
+      "timestamp": 1760891400000,
+      "status": "live",
+      "homeTeam": {
+        "id": 88,
+        "name": "Levante UD",
+        "shortName": "Levante",
+        "logo": "https://crests.football-data.org/88.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 87,
+        "name": "Rayo Vallecano de Madrid",
+        "shortName": "Rayo Vallecano",
+        "logo": "https://crests.football-data.org/87.png",
+        "country": ""
+      },
+      "score": {
+        "home": 0,
+        "away": 2,
+        "halftime": { "home": 0, "away": 2 },
+        "fulltime": { "home": 0, "away": 2 }
+      },
+      "league": {
+        "id": 2014,
+        "name": "Primera Division",
+        "country": "",
+        "logo": "https://crests.football-data.org/laliga.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 536875,
+      "date": "2025-10-19T18:45:00Z",
+      "timestamp": 1760899500000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 98,
+        "name": "AC Milan",
+        "shortName": "Milan",
+        "logo": "https://crests.football-data.org/98.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 99,
+        "name": "ACF Fiorentina",
+        "shortName": "Fiorentina",
+        "logo": "https://crests.football-data.org/99.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2019,
+        "name": "Serie A",
+        "country": "",
+        "logo": "https://crests.football-data.org/SA.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 542470,
+      "date": "2025-10-19T18:45:00Z",
+      "timestamp": 1760899500000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 543,
+        "name": "FC Nantes",
+        "shortName": "Nantes",
+        "logo": "https://crests.football-data.org/543.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 521,
+        "name": "Lille OSC",
+        "shortName": "Lille",
+        "logo": "https://crests.football-data.org/521.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2015,
+        "name": "Ligue 1",
+        "country": "",
+        "logo": "https://crests.football-data.org/FL1.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 544295,
+      "date": "2025-10-19T19:00:00Z",
+      "timestamp": 1760900400000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 82,
+        "name": "Getafe CF",
+        "shortName": "Getafe",
+        "logo": "https://crests.football-data.org/82.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 86,
+        "name": "Real Madrid CF",
+        "shortName": "Real Madrid",
+        "logo": "https://crests.football-data.org/86.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2014,
+        "name": "Primera Division",
+        "country": "",
+        "logo": "https://crests.football-data.org/laliga.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 535215,
+      "date": "2025-10-19T19:00:00Z",
+      "timestamp": 1760900400000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 1783,
+        "name": "CR Flamengo",
+        "shortName": "Flamengo",
+        "logo": "https://crests.football-data.org/1783.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1769,
+        "name": "SE Palmeiras",
+        "shortName": "Palmeiras",
+        "logo": "https://crests.football-data.org/1769.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "country": "",
+        "logo": "https://crests.football-data.org/bsa.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 535223,
+      "date": "2025-10-19T21:30:00Z",
+      "timestamp": 1760909400000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 1837,
+        "name": "Ceará SC",
+        "shortName": "Ceará",
+        "logo": "https://crests.football-data.org/1837.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1770,
+        "name": "Botafogo FR",
+        "shortName": "Botafogo",
+        "logo": "https://crests.football-data.org/1770.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "country": "",
+        "logo": "https://crests.football-data.org/bsa.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 535219,
+      "date": "2025-10-19T21:30:00Z",
+      "timestamp": 1760909400000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 4364,
+        "name": "Mirassol FC",
+        "shortName": "Mirassol",
+        "logo": "https://crests.football-data.org/4364.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1776,
+        "name": "São Paulo FC",
+        "shortName": "São Paulo",
+        "logo": "https://crests.football-data.org/1776.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "country": "",
+        "logo": "https://crests.football-data.org/bsa.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 535221,
+      "date": "2025-10-19T21:30:00Z",
+      "timestamp": 1760909400000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 6684,
+        "name": "SC Internacional",
+        "shortName": "Internacional",
+        "logo": "https://crests.football-data.org/6684.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1778,
+        "name": "SC Recife",
+        "shortName": "Recife",
+        "logo": "https://crests.football-data.org/1778.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "country": "",
+        "logo": "https://crests.football-data.org/bsa.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    },
+    {
+      "id": 535222,
+      "date": "2025-10-19T23:30:00Z",
+      "timestamp": 1760916600000,
+      "status": "scheduled",
+      "homeTeam": {
+        "id": 1777,
+        "name": "EC Bahia",
+        "shortName": "Bahia",
+        "logo": "https://crests.football-data.org/1777.png",
+        "country": ""
+      },
+      "awayTeam": {
+        "id": 1767,
+        "name": "Grêmio FBPA",
+        "shortName": "Grêmio",
+        "logo": "https://crests.football-data.org/1767.png",
+        "country": ""
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": { "home": null, "away": null },
+        "fulltime": { "home": null, "away": null }
+      },
+      "league": {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "country": "",
+        "logo": "https://crests.football-data.org/bsa.png",
+        "season": 2025,
+        "type": "LEAGUE"
+      }
+    }
+  ]
+}
