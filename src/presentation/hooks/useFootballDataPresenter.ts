@@ -386,6 +386,11 @@ export function useFootballDataPresenter() {
   }, [store]);
 
   return {
+    favouriteLeagueIds: store.favouriteLeagueIds,
+    toggleFavouriteLeague: store.toggleFavouriteLeague,
+    setFavouriteLeagues: store.setFavouriteLeagues,
+    isLeagueFavourite: store.isLeagueFavourite,
+
     // Leagues
     fetchAllLeagues,
     fetchLeagueById,

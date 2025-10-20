@@ -38,6 +38,7 @@ interface FootballStoreState {
   leagues: CacheEntry<League[]> | null;
   leagueById: Record<number, CacheEntry<League>>;
   leaguesByCountry: Record<string, CacheEntry<League[]>>;
+  favouriteLeagueIds: string[];
 
   // Matches
   liveMatches: CacheEntry<Match[]> | null;
@@ -81,6 +82,9 @@ interface FootballStoreState {
   setLeagues: (data: League[]) => void;
   setLeagueById: (id: number, data: League) => void;
   setLeaguesByCountry: (country: string, data: League[]) => void;
+  toggleFavouriteLeague: (leagueId: string) => void;
+  setFavouriteLeagues: (leagueIds: string[]) => void;
+  isLeagueFavourite: (leagueId: string) => boolean;
 
   setLiveMatches: (data: Match[]) => void;
   setMatchesByDate: (date: string, data: Match[]) => void;
@@ -236,6 +240,7 @@ export const useFootballStore = create<FootballStoreState>()(
       leagues: null,
       leagueById: {},
       leaguesByCountry: {},
+      favouriteLeagueIds: [],
       liveMatches: null,
       matchesByDate: {},
       matchesByLeague: {},
@@ -268,6 +273,21 @@ export const useFootballStore = create<FootballStoreState>()(
             [country]: createCacheEntry(data),
           },
         })),
+
+      toggleFavouriteLeague: (leagueId) =>
+        set((state) => {
+          const exists = state.favouriteLeagueIds.includes(leagueId);
+          const nextFavouriteLeagueIds = exists
+            ? state.favouriteLeagueIds.filter((id) => id !== leagueId)
+            : [...state.favouriteLeagueIds, leagueId];
+          return { favouriteLeagueIds: nextFavouriteLeagueIds };
+        }),
+
+      setFavouriteLeagues: (leagueIds) =>
+        set({ favouriteLeagueIds: [...new Set(leagueIds)] }),
+
+      isLeagueFavourite: (leagueId) =>
+        get().favouriteLeagueIds.includes(leagueId),
 
       setLiveMatches: (data) => set({ liveMatches: createCacheEntry(data) }),
 
@@ -569,6 +589,7 @@ export const useFootballStore = create<FootballStoreState>()(
           leagues: null,
           leagueById: {},
           leaguesByCountry: {},
+          favouriteLeagueIds: [],
           liveMatches: null,
           matchesByDate: {},
           matchesByLeague: {},
