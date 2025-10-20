@@ -5,7 +5,7 @@
 
 import type { Match as DomainMatch } from "@/src/domain/entities/football.entity";
 import { MatchStatus } from "@/src/domain/entities/football.entity";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFootballDataPresenter } from "../../hooks/useFootballDataPresenter";
 import {
   MatchesPresenter,
@@ -36,6 +36,7 @@ export interface MatchesPresenterActions {
   loadMore: () => void;
   reset: () => void;
   setError: (error: string | null) => void;
+  toggleLeagueFavourite: (leagueId: string) => void;
 }
 
 /**
@@ -77,6 +78,16 @@ export function useMatchesPresenter(
 
   // Get football data presenter for caching
   const footballData = useFootballDataPresenter();
+  const {
+    fetchMatchesByDate,
+    fetchLiveMatches,
+    fetchFinishedMatches,
+    fetchUpcomingMatches,
+    fetchMatchesByLeague,
+    favouriteLeagueIds,
+    toggleFavouriteLeague,
+  } = footballData;
+  const favouriteLeagueIdsRef = useRef<string[]>(favouriteLeagueIds);
 
   /**
    * Load initial data from cache or API
@@ -232,29 +243,29 @@ export function useMatchesPresenter(
 
       const fetchMatches = async (): Promise<DomainMatch[]> => {
         if (dateFilter) {
-          return footballData.fetchMatchesByDate(dateFilter);
+          return fetchMatchesByDate(dateFilter);
         }
 
         if (statusFilter === "live") {
-          return footballData.fetchLiveMatches();
+          return fetchLiveMatches();
         }
 
         if (statusFilter === "finished") {
-          return footballData.fetchFinishedMatches(leagueFilter);
+          return fetchFinishedMatches(leagueFilter);
         }
 
         if (statusFilter === "upcoming") {
-          return footballData.fetchUpcomingMatches(leagueFilter);
+          return fetchUpcomingMatches(leagueFilter);
         }
 
         if (leagueFilter) {
-          return footballData.fetchMatchesByLeague(leagueFilter);
+          return fetchMatchesByLeague(leagueFilter);
         }
 
         const [live, upcoming, finished] = await Promise.all([
-          footballData.fetchLiveMatches(),
-          footballData.fetchUpcomingMatches(),
-          footballData.fetchFinishedMatches(),
+          fetchLiveMatches(),
+          fetchUpcomingMatches(),
+          fetchFinishedMatches(),
         ]);
 
         const matchMap = new Map<number, DomainMatch>();
@@ -300,8 +311,10 @@ export function useMatchesPresenter(
       const initialVisible = Math.min(mappedMatches.length, INITIAL_BATCH_SIZE);
       const limitedMatches = mappedMatches.slice(0, initialVisible);
 
+      const currentFavouriteLeagueIds = favouriteLeagueIdsRef.current;
       const groupedMatches = MatchPresenterMapper.groupMatchesByStatusAndLeague(
-        limitedMatches
+        limitedMatches,
+        currentFavouriteLeagueIds
       );
 
       const stats = {
@@ -321,8 +334,12 @@ export function useMatchesPresenter(
       setViewModel({
         matches: limitedMatches,
         matchesByLeague:
-          MatchPresenterMapper.groupMatchesByLeague(limitedMatches),
+          MatchPresenterMapper.groupMatchesByLeague(
+            limitedMatches,
+            currentFavouriteLeagueIds
+          ),
         groupedMatches,
+        favouriteLeagueIds: currentFavouriteLeagueIds,
         stats,
         filters: { ...filters, date: dateFilter },
         totalCount: mappedMatches.length,
@@ -342,10 +359,17 @@ export function useMatchesPresenter(
           INITIAL_BATCH_SIZE
         );
         const fallbackMatches = fallbackViewModel.matches;
+        const currentFavouriteLeagueIds = favouriteLeagueIdsRef.current;
         const mappedMatchesByLeague =
-          MatchPresenterMapper.groupMatchesByLeague(fallbackMatches);
+          MatchPresenterMapper.groupMatchesByLeague(
+            fallbackMatches,
+            currentFavouriteLeagueIds
+          );
         const mappedGroupedMatches =
-          MatchPresenterMapper.groupMatchesByStatusAndLeague(fallbackMatches);
+          MatchPresenterMapper.groupMatchesByStatusAndLeague(
+            fallbackMatches,
+            currentFavouriteLeagueIds
+          );
 
         setAllMatches(fallbackMatches);
         setVisibleCount(Math.min(fallbackMatches.length, INITIAL_BATCH_SIZE));
@@ -354,6 +378,7 @@ export function useMatchesPresenter(
           matches: fallbackMatches,
           matchesByLeague: mappedMatchesByLeague,
           groupedMatches: mappedGroupedMatches,
+          favouriteLeagueIds: currentFavouriteLeagueIds,
         });
       } catch (fallbackError) {
         console.error("Fallback matches data failed:", fallbackError);
@@ -361,7 +386,18 @@ export function useMatchesPresenter(
     } finally {
       setLoading(false);
     }
-  }, [filters, mapDomainMatchToPresenterMatch, mapStatusToViewStatus, today]);
+  }, [
+    fetchFinishedMatches,
+    fetchLiveMatches,
+    fetchMatchesByDate,
+    fetchMatchesByLeague,
+    fetchUpcomingMatches,
+    filters,
+    mapDomainMatchToPresenterMatch,
+    mapStatusToViewStatus,
+    presenter,
+    today,
+  ]);
 
   /**
    * Refresh data
@@ -403,14 +439,22 @@ export function useMatchesPresenter(
       setViewModel((prev) => {
         if (!prev) return prev;
         const limitedMatches = allMatches.slice(0, nextVisible);
+        const currentFavouriteLeagueIds = favouriteLeagueIdsRef.current;
         const groupedMatches =
-          MatchPresenterMapper.groupMatchesByStatusAndLeague(limitedMatches);
+          MatchPresenterMapper.groupMatchesByStatusAndLeague(
+            limitedMatches,
+            currentFavouriteLeagueIds
+          );
         return {
           ...prev,
           matches: limitedMatches,
           matchesByLeague:
-            MatchPresenterMapper.groupMatchesByLeague(limitedMatches),
+            MatchPresenterMapper.groupMatchesByLeague(
+              limitedMatches,
+              currentFavouriteLeagueIds
+            ),
           groupedMatches,
+          favouriteLeagueIds: currentFavouriteLeagueIds,
           perPage: nextVisible,
         };
       });
@@ -455,7 +499,33 @@ export function useMatchesPresenter(
     loadMore,
     reset,
     setError,
+    toggleLeagueFavourite: toggleFavouriteLeague,
   };
+
+  useEffect(() => {
+    favouriteLeagueIdsRef.current = favouriteLeagueIds;
+    setViewModel((prev) => {
+      if (!prev) return prev;
+
+      const sourceMatches = allMatches.length > 0 ? allMatches : prev.matches;
+      const limitedMatches = sourceMatches.slice(0, visibleCount);
+      const matchesForGrouping =
+        limitedMatches.length > 0 ? limitedMatches : sourceMatches;
+
+      return {
+        ...prev,
+        favouriteLeagueIds,
+        matchesByLeague: MatchPresenterMapper.groupMatchesByLeague(
+          matchesForGrouping,
+          favouriteLeagueIds
+        ),
+        groupedMatches: MatchPresenterMapper.groupMatchesByStatusAndLeague(
+          matchesForGrouping,
+          favouriteLeagueIds
+        ),
+      };
+    });
+  }, [allMatches, favouriteLeagueIds, visibleCount]);
 
   return [state, actions];
 }

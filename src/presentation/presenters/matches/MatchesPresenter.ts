@@ -67,6 +67,7 @@ export interface MatchesViewModel {
   matches: Match[];
   matchesByLeague: LeagueMatches[];
   groupedMatches: StatusGroupedMatches[];
+  favouriteLeagueIds: string[];
   stats: MatchStats;
   filters: MatchFilters;
   totalCount: number;
@@ -126,7 +127,10 @@ export class MatchPresenterMapper {
   }
 
   // Group matches by league
-  static groupMatchesByLeague(matches: Match[]): LeagueMatches[] {
+  static groupMatchesByLeague(
+    matches: Match[],
+    favouriteLeagueIds: string[] = []
+  ): LeagueMatches[] {
     const leagueMap = new Map<string, Match[]>();
 
     const parseDate = (dateStr: string) => {
@@ -182,13 +186,36 @@ export class MatchPresenterMapper {
     });
 
     // Convert map to array of LeagueMatches
-    return Array.from(leagueMap.entries()).map(([league, leagueMatches]) => ({
-      league,
-      matches: [...leagueMatches].sort(compareMatches),
-    }));
+    const favouriteIndex = new Map<string, number>();
+    favouriteLeagueIds.forEach((id, index) => {
+      favouriteIndex.set(id, index);
+    });
+
+    return Array.from(leagueMap.entries())
+      .map(([league, leagueMatches]) => ({
+        league,
+        matches: [...leagueMatches].sort(compareMatches),
+      }))
+      .sort((a, b) => {
+        const aId = String(a.matches[0]?.league.id ?? "");
+        const bId = String(b.matches[0]?.league.id ?? "");
+        const aFav = favouriteIndex.has(aId)
+          ? favouriteIndex.get(aId) ?? Number.MAX_SAFE_INTEGER
+          : Number.MAX_SAFE_INTEGER;
+        const bFav = favouriteIndex.has(bId)
+          ? favouriteIndex.get(bId) ?? Number.MAX_SAFE_INTEGER
+          : Number.MAX_SAFE_INTEGER;
+        if (aFav === bFav) {
+          return a.league.localeCompare(b.league, "th");
+        }
+        return aFav - bFav;
+      });
   }
 
-  static groupMatchesByStatusAndLeague(matches: Match[]): StatusGroupedMatches[] {
+  static groupMatchesByStatusAndLeague(
+    matches: Match[],
+    favouriteLeagueIds: string[] = []
+  ): StatusGroupedMatches[] {
     const statusOrder: Array<StatusGroupedMatches["status"]> = [
       "live",
       "upcoming",
@@ -197,7 +224,9 @@ export class MatchPresenterMapper {
 
     const statusBuckets = new Map<StatusGroupedMatches["status"], Match[]>();
 
-    const normalizeStatus = (status: Match["status"]): StatusGroupedMatches["status"] => {
+    const normalizeStatus = (
+      status: Match["status"]
+    ): StatusGroupedMatches["status"] => {
       switch (status) {
         case "live":
           return "live";
@@ -224,7 +253,10 @@ export class MatchPresenterMapper {
         }
         return {
           status,
-          leagues: MatchPresenterMapper.groupMatchesByLeague(statusMatches),
+          leagues: MatchPresenterMapper.groupMatchesByLeague(
+            statusMatches,
+            favouriteLeagueIds
+          ),
         };
       })
       .filter((group): group is StatusGroupedMatches => Boolean(group));
@@ -301,10 +333,10 @@ export class MatchesPresenter {
       };
 
       return {
-        matches: mappedMatches,
-        matchesByLeague: MatchPresenterMapper.groupMatchesByLeague(mappedMatches),
-        groupedMatches:
-          MatchPresenterMapper.groupMatchesByStatusAndLeague(mappedMatches),
+        matches: [],
+        matchesByLeague: MatchPresenterMapper.groupMatchesByLeague([]),
+        groupedMatches: MatchPresenterMapper.groupMatchesByStatusAndLeague([]),
+        favouriteLeagueIds: [],
         stats,
         filters,
         totalCount,

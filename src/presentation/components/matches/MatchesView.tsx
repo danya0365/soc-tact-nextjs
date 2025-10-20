@@ -107,8 +107,6 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
     );
   }
 
-  const groupedMatches = viewModel.groupedMatches ?? [];
-
   // No data state
   if (!viewModel) {
     return (
@@ -126,6 +124,9 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
       </div>
     );
   }
+
+  const groupedMatches = viewModel.groupedMatches ?? [];
+  const favouriteLeagueIds = viewModel.favouriteLeagueIds ?? [];
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
@@ -304,8 +305,20 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                 <div className="space-y-6">
                   {statusGroup.leagues.map((leagueGroup) => {
                     const leagueInfo = leagueGroup.matches[0]?.league;
+                    const rawLeagueId = leagueGroup.matches[0]?.league.id;
+                    const leagueId =
+                      rawLeagueId !== undefined
+                        ? String(rawLeagueId)
+                        : leagueGroup.league;
+                    const isFavourite = favouriteLeagueIds.includes(leagueId);
+                    const handleToggleFavourite = () => {
+                      actions.toggleLeagueFavourite(leagueId);
+                    };
                     return (
-                      <div key={`${statusGroup.status}-${leagueGroup.league}`} className="space-y-4">
+                      <div
+                        key={`${statusGroup.status}-${leagueGroup.league}`}
+                        className="space-y-4"
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             {leagueInfo?.logo && (
@@ -319,7 +332,9 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                                     className="object-contain"
                                   />
                                 ) : (
-                                  <span className="text-xl">{leagueInfo.logo}</span>
+                                  <span className="text-xl">
+                                    {leagueInfo.logo}
+                                  </span>
                                 )}
                               </>
                             )}
@@ -332,6 +347,22 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                               </p>
                             </div>
                           </div>
+                          <button
+                            type="button"
+                            onClick={handleToggleFavourite}
+                            className={`ml-4 text-2xl transition-colors ${
+                              isFavourite
+                                ? "text-yellow-400 hover:text-yellow-300"
+                                : "text-gray-300 hover:text-yellow-300"
+                            }`}
+                            aria-label={
+                              isFavourite
+                                ? `นำ ${leagueGroup.league} ออกจากลีกโปรด`
+                                : `เพิ่ม ${leagueGroup.league} เป็นลีกโปรด`
+                            }
+                          >
+                            {isFavourite ? "★" : "☆"}
+                          </button>
                         </div>
 
                         <div className="space-y-4">
@@ -425,7 +456,9 @@ export function MatchesView({ initialViewModel }: MatchesViewProps) {
                                 <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                                   <div className="flex items-center space-x-4">
                                     <span>📍 {match.venue.name}</span>
-                                    {match.referee && <span>👨‍⚖️ {match.referee}</span>}
+                                    {match.referee && (
+                                      <span>👨‍⚖️ {match.referee}</span>
+                                    )}
                                   </div>
                                   {match.status !== "upcoming" && (
                                     <div className="flex items-center space-x-2">
