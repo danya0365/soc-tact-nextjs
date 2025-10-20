@@ -3,12 +3,6 @@
  * Handles business logic for the Matches page
  */
 
-import {
-  getMatchesByStatus,
-  MockMatch,
-  mockMatches,
-} from "@/src/data/mock/matches.mock";
-
 // View Model interfaces
 export interface Match {
   id: string;
@@ -86,46 +80,6 @@ export interface StatusGroupedMatches {
 }
 
 export class MatchPresenterMapper {
-  /**
-   * Map API Match to LiveMatch view model
-   */
-  static mapToMatch(match: MockMatch): Match {
-    return {
-      id: match.id.toString(),
-      homeTeam: {
-        id: match.homeTeam.id,
-        name: match.homeTeam.name,
-        logo: match.homeTeam.logo,
-        shortName: match.homeTeam.shortName,
-      },
-      awayTeam: {
-        id: match.awayTeam.id,
-        name: match.awayTeam.name,
-        logo: match.awayTeam.logo,
-        shortName: match.awayTeam.shortName,
-      },
-      score: {
-        home: match.score.home ?? 0,
-        away: match.score.away ?? 0,
-      },
-      minute: match.minute ?? 0,
-      status: match.status,
-      league: {
-        id: match.league.id,
-        name: match.league.name,
-        logo: match.league.logo,
-        country: match.league.country,
-      },
-      venue: {
-        name: match.venue.name,
-        city: match.venue.city,
-      },
-      date: match.date,
-      time: match.time,
-      referee: match.referee,
-    };
-  }
-
   // Group matches by league
   static groupMatchesByLeague(
     matches: Match[],
@@ -277,59 +231,11 @@ export class MatchesPresenter {
     perPage: number = 100
   ): Promise<MatchesViewModel> {
     try {
-      // Get filtered matches
-      let filteredMatches = [...mockMatches];
-
-      // Apply status filter
-      if (filters.status && filters.status !== "all") {
-        filteredMatches = getMatchesByStatus(filters.status);
-      }
-
-      // Apply league filter
-      if (filters.league) {
-        filteredMatches = filteredMatches.filter(
-          (match) => match.league.id === filters.league
-        );
-      }
-
-      // Apply date filter
-      if (filters.date) {
-        filteredMatches = filteredMatches.filter(
-          (match) => match.date === filters.date
-        );
-      }
-
-      // Apply search filter
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        filteredMatches = filteredMatches.filter(
-          (match) =>
-            match.homeTeam.name.toLowerCase().includes(query) ||
-            match.awayTeam.name.toLowerCase().includes(query) ||
-            match.league.name.toLowerCase().includes(query)
-        );
-      }
-
-      // Pagination
-      const totalCount = filteredMatches.length;
-      const startIndex = (page - 1) * perPage;
-      const endIndex = startIndex + perPage;
-      const paginatedMatches = filteredMatches.slice(startIndex, endIndex);
-
-      const mappedMatches = paginatedMatches.map((match) =>
-        MatchPresenterMapper.mapToMatch(match)
-      );
-
       const stats: MatchStats = {
-        totalMatches: filteredMatches.length,
-        liveMatches: filteredMatches.filter((match) => match.status === "live")
-          .length,
-        finishedMatches: filteredMatches.filter(
-          (match) => match.status === "finished"
-        ).length,
-        upcomingMatches: filteredMatches.filter(
-          (match) => match.status === "upcoming"
-        ).length,
+        totalMatches: 0,
+        liveMatches: 0,
+        finishedMatches: 0,
+        upcomingMatches: 0,
       };
 
       return {
@@ -339,7 +245,7 @@ export class MatchesPresenter {
         favouriteLeagueIds: [],
         stats,
         filters,
-        totalCount,
+        totalCount: 0,
         page,
         perPage,
       };
@@ -372,8 +278,7 @@ export class MatchesPresenter {
    */
   async getMatchById(id: string): Promise<Match | null> {
     try {
-      const match = mockMatches.find((m) => m.id === id);
-      return match || null;
+      return null;
     } catch (error) {
       console.error("Error in MatchesPresenter.getMatchById:", error);
       throw error;
@@ -387,17 +292,7 @@ export class MatchesPresenter {
     Array<{ id: string; name: string; logo: string }>
   > {
     try {
-      const leagues = mockMatches.reduce((acc, match) => {
-        if (!acc.find((l) => l.id === match.league.id)) {
-          acc.push({
-            id: match.league.id,
-            name: match.league.name,
-            logo: match.league.logo,
-          });
-        }
-        return acc;
-      }, [] as Array<{ id: string; name: string; logo: string }>);
-      return leagues;
+      return [];
     } catch (error) {
       console.error("Error in MatchesPresenter.getAvailableLeagues:", error);
       throw error;
@@ -409,8 +304,7 @@ export class MatchesPresenter {
    */
   async getAvailableDates(): Promise<string[]> {
     try {
-      const dates = [...new Set(mockMatches.map((match) => match.date))];
-      return dates.sort();
+      return [];
     } catch (error) {
       console.error("Error in MatchesPresenter.getAvailableDates:", error);
       throw error;
