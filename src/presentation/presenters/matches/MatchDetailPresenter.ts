@@ -180,6 +180,7 @@ const TIME_DISPLAY_FORMATTER = new Intl.DateTimeFormat("th-TH", {
 
 const DEFAULT_LOGO = "⚽";
 const DEFAULT_VENUE_NAME = "สนามแข่งขัน";
+const DEFAULT_VENUE_CITY = "";
 
 function mapTeam(team: Match["homeTeam"]): TeamSummary {
   return {
@@ -275,7 +276,7 @@ function mapDomainMatchToDetail(match: Match): MatchDetail {
     league: mapLeague(match.league),
     venue: {
       name: match.venue?.trim() || DEFAULT_VENUE_NAME,
-      city: match.league.country,
+      city: match.league.country || DEFAULT_VENUE_CITY,
     },
     matchday: match.matchday ?? null,
     stage: mapStageLabel(match.stage),
