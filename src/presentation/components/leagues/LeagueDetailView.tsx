@@ -2,6 +2,7 @@
 
 import type { LeagueDetailViewModel } from "@/src/presentation/presenters/leagues/LeagueDetailPresenter";
 import { useLeagueDetailPresenter } from "@/src/presentation/presenters/leagues/useLeagueDetailPresenter";
+import Image from "next/image";
 import Link from "next/link";
 
 interface LeagueDetailViewProps {
@@ -18,6 +19,52 @@ export function LeagueDetailView({
   const standings = state.viewModel?.standings || [];
   const topScorers = state.viewModel?.topScorers || [];
   const upcomingFixtures = state.viewModel?.upcomingFixtures || [];
+
+  const renderEmblem = (logo: string | undefined, name: string, size = 56) => {
+    const displayName = name?.trim() || "?";
+    const isUrl = logo?.startsWith("http");
+
+    if (isUrl && logo) {
+      return (
+        <div
+          className="relative overflow-hidden rounded-full bg-white shadow"
+          style={{ height: size, width: size }}
+        >
+          <Image
+            src={logo}
+            alt={displayName}
+            fill
+            sizes="56px"
+            className="object-contain"
+            priority
+          />
+        </div>
+      );
+    }
+
+    const fallback = logo?.slice(0, 2) || displayName.slice(0, 2).toUpperCase();
+
+    return (
+      <div
+        className="flex items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-lg font-semibold text-gray-700 shadow"
+        style={{ height: size, width: size }}
+      >
+        {fallback}
+      </div>
+    );
+  };
+
+  const renderFormIcons = (form: Array<"W" | "D" | "L">) => {
+    if (!form.length) {
+      return <span className="text-xs text-gray-400">-</span>;
+    }
+
+    return form.map((result, index) => (
+      <span key={`${result}-${index}`} className="text-sm">
+        {getFormIcon(result)}
+      </span>
+    ));
+  };
 
   // Helper functions
   const getFormIcon = (result: "W" | "D" | "L") => {
@@ -105,7 +152,7 @@ export function LeagueDetailView({
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-6xl">{league.logo}</span>
+              {renderEmblem(league.logo, league.name)}
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {league.name}
@@ -120,7 +167,7 @@ export function LeagueDetailView({
                 นัดการแข่งขัน
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {league.currentMatchday}/{league.totalMatchdays}
+                {league.currentMatchday ?? "-"}/{league.totalMatchdays ?? "-"}
               </p>
             </div>
           </div>
@@ -218,8 +265,18 @@ export function LeagueDetailView({
                       league.totalTeams
                     )}`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-100">
+                      <span
+                        className={`${
+                          standing.position <= 4
+                            ? "text-blue-600 dark:text-blue-400 font-bold"
+                            : standing.position <= 6
+                              ? "text-green-600 dark:text-green-400 font-bold"
+                              : standing.position > league.totalTeams - 3
+                                ? "text-red-600 dark:text-red-400 font-bold"
+                                : "text-gray-900 dark:text-gray-100"
+                        }`}
+                      >
                         {standing.position}
                       </span>
                     </td>
@@ -228,14 +285,14 @@ export function LeagueDetailView({
                         href={`/teams/${standing.team.id}`}
                         className="flex items-center space-x-3 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                       >
-                        <span className="text-2xl">{standing.team.logo}</span>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {renderEmblem(standing.team.logo, standing.team.name, 44)}
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {standing.team.name}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {standing.team.shortName}
-                          </div>
+                          </span>
                         </div>
                       </Link>
                     </td>
@@ -278,11 +335,7 @@ export function LeagueDetailView({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center space-x-1">
-                        {standing.form.map((result, index) => (
-                          <span key={index} className="text-sm">
-                            {getFormIcon(result)}
-                          </span>
-                        ))}
+                        {renderFormIcons(standing.form)}
                       </div>
                     </td>
                   </tr>
@@ -324,10 +377,10 @@ export function LeagueDetailView({
                     className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0"
                   >
                     <div className="flex items-center space-x-3">
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 w-6">
+                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 w-6 text-right">
                         {index + 1}
                       </span>
-                      <span className="text-xl">{scorer.teamLogo}</span>
+                      {renderEmblem(scorer.teamLogo, scorer.team, 44)}
                       <div>
                         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                           {scorer.name}
@@ -342,7 +395,7 @@ export function LeagueDetailView({
                         {scorer.goals}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        ⚽ {scorer.goals} 🎯 {scorer.assists}
+                        ⚽ {scorer.goals} 🎯 {scorer.assists ?? 0}
                       </div>
                     </div>
                   </div>

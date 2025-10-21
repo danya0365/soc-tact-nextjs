@@ -1,11 +1,37 @@
 "use client";
 
 import type { LeaguesViewModel } from "@/src/presentation/presenters/leagues/LeaguesPresenter";
+import Image from "next/image";
 import { useLeaguesPresenter } from "@/src/presentation/presenters/leagues/useLeaguesPresenter";
 import Link from "next/link";
 
 interface LeaguesViewProps {
   initialViewModel?: LeaguesViewModel;
+}
+
+function LeagueLogo({ logo, name }: { logo: string; name: string }) {
+  const isUrl = logo?.startsWith("http");
+
+  if (isUrl) {
+    return (
+      <Image
+        src={logo}
+        alt={name}
+        fill
+        sizes="56px"
+        className="object-contain"
+        priority
+      />
+    );
+  }
+
+  const fallback = logo || name.slice(0, 2).toUpperCase();
+
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-lg font-semibold text-gray-700">
+      {fallback}
+    </div>
+  );
 }
 
 export function LeaguesView({ initialViewModel }: LeaguesViewProps) {
@@ -98,7 +124,9 @@ export function LeaguesView({ initialViewModel }: LeaguesViewProps) {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <span className="text-4xl">{league.logo}</span>
+                  <div className="relative h-14 w-14 overflow-hidden rounded-full bg-white shadow">
+                    <LeagueLogo logo={league.logo} name={league.name} />
+                  </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
                       {league.name}
@@ -120,13 +148,19 @@ export function LeaguesView({ initialViewModel }: LeaguesViewProps) {
                 <div className="flex justify-between">
                   <span>จำนวนทีม:</span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {league.totalTeams}
+                    {league.totalTeams ?? "-"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>นัดการแข่งขัน:</span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {league.currentMatchday}/{league.totalMatchdays}
+                    {league.currentMatchday ?? "-"}/{league.totalMatchdays ?? "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ประเภท:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    {league.competitionType}
                   </span>
                 </div>
               </div>

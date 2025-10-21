@@ -3,22 +3,24 @@
  * Handles business logic for the Leagues list page
  */
 
-import { mockLeagues, type MockLeague } from "@/src/data/mock/leagues.mock";
+import type { League as DomainLeague } from "@/src/domain/entities/football.entity";
+import { getAllLeagues } from "@/src/infrastructure/api/football.api";
 
 // View Model interfaces
-export interface League {
+export interface LeagueSummary {
   id: string;
   name: string;
   logo: string;
   country: string;
   season: string;
-  totalTeams: number;
-  currentMatchday: number;
-  totalMatchdays: number;
+  competitionType: string;
+  totalTeams: number | null;
+  currentMatchday: number | null;
+  totalMatchdays: number | null;
 }
 
 export interface LeaguesViewModel {
-  leagues: League[];
+  leagues: LeagueSummary[];
   totalCount: number;
 }
 
@@ -31,9 +33,14 @@ export class LeaguesPresenter {
    */
   async getViewModel(): Promise<LeaguesViewModel> {
     try {
+      const leagues = await getAllLeagues();
+      const mapped = leagues.map(mapLeagueSummary).sort((a, b) =>
+        a.name.localeCompare(b.name, "th-TH")
+      );
+
       return {
-        leagues: mockLeagues,
-        totalCount: mockLeagues.length,
+        leagues: mapped,
+        totalCount: mapped.length,
       };
     } catch (error) {
       console.error("Error in LeaguesPresenter.getViewModel:", error);
@@ -62,10 +69,11 @@ export class LeaguesPresenter {
   /**
    * Get league by ID
    */
-  async getLeagueById(id: string): Promise<League | null> {
+  async getLeagueById(id: string): Promise<LeagueSummary | null> {
     try {
-      const league = mockLeagues.find((l) => l.id === id);
-      return league || null;
+      const leagues = await getAllLeagues();
+      const league = leagues.find((l) => l.id.toString() === id);
+      return league ? mapLeagueSummary(league) : null;
     } catch (error) {
       console.error("Error in LeaguesPresenter.getLeagueById:", error);
       throw error;
@@ -84,4 +92,36 @@ export class LeaguesPresenterFactory {
   static createClient(): LeaguesPresenter {
     return new LeaguesPresenter();
   }
+}
+
+function mapLeagueSummary(league: DomainLeague): LeagueSummary {
+  return {
+    id: league.id.toString(),
+    name: league.name,
+    logo: getLeagueLogoSymbol(league.logo, league.name),
+    country: league.country,
+    season: formatSeasonLabel(league.season),
+    competitionType: league.type,
+    totalTeams: null,
+    currentMatchday: null,
+    totalMatchdays: null,
+  };
+}
+
+function formatSeasonLabel(season?: number): string {
+  if (!season) {
+    return "-";
+  }
+
+  const nextSeason = season + 1;
+  return `${season}/${nextSeason.toString().slice(-2)}`;
+}
+
+function getLeagueLogoSymbol(logo: string | undefined, name: string): string {
+  if (logo && !logo.startsWith("http")) {
+    return logo;
+  }
+
+  const initial = name.trim().charAt(0);
+  return initial ? initial.toUpperCase() : "🏆";
 }
