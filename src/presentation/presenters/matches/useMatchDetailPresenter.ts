@@ -2,12 +2,10 @@
  * Custom hook for Match Detail presenter
  */
 
-import { useCallback, useEffect, useState } from "react";
-import {
-  MatchDetailPresenter,
-  MatchDetailPresenterFactory,
-  type MatchDetailViewModel,
-} from "./MatchDetailPresenter";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { MatchDetailViewModel } from "./MatchDetailPresenter";
+import { buildMatchDetailViewModel } from "./MatchDetailPresenter";
+import { useFootballDataPresenter } from "../../hooks/useFootballDataPresenter";
 
 // State interface
 export interface MatchDetailPresenterState {
@@ -29,14 +27,17 @@ export function useMatchDetailPresenter(
   matchId: string,
   initialViewModel: MatchDetailViewModel | null = null
 ): [MatchDetailPresenterState, MatchDetailPresenterActions] {
-  const [presenter] = useState<MatchDetailPresenter>(() =>
-    MatchDetailPresenterFactory.createClient()
-  );
   const [viewModel, setViewModel] = useState<MatchDetailViewModel | null>(
     initialViewModel
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const matchIdNumber = useMemo(() => Number.parseInt(matchId, 10), [matchId]);
+
+  const {
+    fetchMatchById,
+    fetchHeadToHead,
+  } = useFootballDataPresenter();
 
   /**
    * Load data from presenter
@@ -46,7 +47,17 @@ export function useMatchDetailPresenter(
     setError(null);
 
     try {
-      const newViewModel = await presenter.getViewModel(matchId);
+      if (Number.isNaN(matchIdNumber)) {
+        throw new Error("รหัสการแข่งขันไม่ถูกต้อง");
+      }
+
+      const match = await fetchMatchById(matchIdNumber);
+      const headToHead = await fetchHeadToHead(
+        match.homeTeam.id,
+        match.awayTeam.id
+      ).catch(() => null);
+
+      const newViewModel = buildMatchDetailViewModel(match, headToHead ?? null);
       setViewModel(newViewModel);
     } catch (err) {
       const errorMessage =
@@ -56,7 +67,7 @@ export function useMatchDetailPresenter(
     } finally {
       setLoading(false);
     }
-  }, [presenter, matchId]);
+  }, [fetchHeadToHead, fetchMatchById, matchIdNumber]);
 
   /**
    * Refresh data
