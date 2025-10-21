@@ -4,8 +4,23 @@
  * Following Single Responsibility Principle (SOLID)
  */
 
-import axios, { AxiosInstance, AxiosError } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { FOOTBALL_API_CONFIG } from "../config/football-api.config";
+import type {
+  ApiCompetitionsResponse,
+  ApiFilters,
+  ApiHeadToHeadFilters,
+  ApiHeadToHeadResponse,
+  ApiMatchQueryFilters,
+  ApiMatchResponse,
+  ApiMatchesByTeamResponse,
+  ApiMatchesResponse,
+  ApiStandingsResponse,
+  ApiTeamMatchFilters,
+  ApiTeamResponse,
+  ApiTeamsResponse,
+  ApiTopScorersResponse,
+} from "./types/football-data.types";
 
 export class FootballDataDatasource {
   private axiosInstance: AxiosInstance;
@@ -100,7 +115,7 @@ export class FootballDataDatasource {
   /**
    * GET request
    */
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+  async get<T>(endpoint: string, params?: ApiFilters): Promise<T> {
     try {
       const response = await this.axiosInstance.get<T>(endpoint, { params });
       return response.data;
@@ -112,15 +127,19 @@ export class FootballDataDatasource {
   /**
    * Get all competitions/leagues
    */
-  async getCompetitions(): Promise<any> {
-    return this.get("/competitions");
+  async getCompetitions(): Promise<ApiCompetitionsResponse> {
+    return this.get<ApiCompetitionsResponse>("/competitions");
   }
 
   /**
    * Get competition by ID
    */
-  async getCompetitionById(competitionId: number): Promise<any> {
-    return this.get(`/competitions/${competitionId}`);
+  async getCompetitionById(
+    competitionId: number
+  ): Promise<ApiCompetitionsResponse["competitions"][number]> {
+    return this.get<ApiCompetitionsResponse["competitions"][number]>(
+      `/competitions/${competitionId}`
+    );
   }
 
   /**
@@ -128,15 +147,12 @@ export class FootballDataDatasource {
    */
   async getMatchesByCompetition(
     competitionId: number,
-    filters?: {
-      season?: number;
-      matchday?: number;
-      status?: string;
-      dateFrom?: string;
-      dateTo?: string;
-    }
-  ): Promise<any> {
-    return this.get(`/competitions/${competitionId}/matches`, filters);
+    filters?: ApiMatchQueryFilters
+  ): Promise<ApiMatchesResponse> {
+    return this.get<ApiMatchesResponse>(
+      `/competitions/${competitionId}/matches`,
+      filters
+    );
   }
 
   /**
@@ -145,9 +161,12 @@ export class FootballDataDatasource {
   async getStandingsByCompetition(
     competitionId: number,
     season?: number
-  ): Promise<any> {
+  ): Promise<ApiStandingsResponse> {
     const params = season ? { season } : undefined;
-    return this.get(`/competitions/${competitionId}/standings`, params);
+    return this.get<ApiStandingsResponse>(
+      `/competitions/${competitionId}/standings`,
+      params
+    );
   }
 
   /**
@@ -156,44 +175,52 @@ export class FootballDataDatasource {
   async getTopScorersByCompetition(
     competitionId: number,
     season?: number
-  ): Promise<any> {
+  ): Promise<ApiTopScorersResponse> {
     const params = season ? { season } : undefined;
-    return this.get(`/competitions/${competitionId}/scorers`, params);
+    return this.get<ApiTopScorersResponse>(
+      `/competitions/${competitionId}/scorers`,
+      params
+    );
   }
 
   /**
    * Get match by ID
    */
-  async getMatchById(matchId: number): Promise<any> {
-    return this.get(`/matches/${matchId}`);
+  async getMatchById(matchId: number): Promise<ApiMatchResponse> {
+    return this.get<ApiMatchResponse>(`/matches/${matchId}`);
   }
 
   /**
    * Get matches by date
    */
-  async getMatchesByDate(date: string): Promise<any> {
-    return this.get("/matches", { date });
+  async getMatchesByDate(date: string): Promise<ApiMatchesResponse> {
+    return this.get<ApiMatchesResponse>("/matches", { date });
   }
 
   /**
    * Get matches by date range
    */
-  async getMatchesByDateRange(dateFrom: string, dateTo: string): Promise<any> {
-    return this.get("/matches", { dateFrom, dateTo });
+  async getMatchesByDateRange(
+    dateFrom: string,
+    dateTo: string
+  ): Promise<ApiMatchesResponse> {
+    return this.get<ApiMatchesResponse>("/matches", { dateFrom, dateTo });
   }
 
   /**
    * Get team by ID
    */
-  async getTeamById(teamId: number): Promise<any> {
-    return this.get(`/teams/${teamId}`);
+  async getTeamById(teamId: number): Promise<ApiTeamResponse> {
+    return this.get<ApiTeamResponse>(`/teams/${teamId}`);
   }
 
   /**
    * Get teams by competition
    */
-  async getTeamsByCompetition(competitionId: number): Promise<any> {
-    return this.get(`/competitions/${competitionId}/teams`);
+  async getTeamsByCompetition(
+    competitionId: number
+  ): Promise<ApiTeamsResponse> {
+    return this.get<ApiTeamsResponse>(`/competitions/${competitionId}/teams`);
   }
 
   /**
@@ -201,21 +228,24 @@ export class FootballDataDatasource {
    */
   async getTeamMatches(
     teamId: number,
-    filters?: {
-      season?: number;
-      status?: string;
-      dateFrom?: string;
-      dateTo?: string;
-      limit?: number;
-    }
-  ): Promise<any> {
-    return this.get(`/teams/${teamId}/matches`, filters);
+    filters?: ApiTeamMatchFilters
+  ): Promise<ApiMatchesByTeamResponse> {
+    return this.get<ApiMatchesByTeamResponse>(
+      `/teams/${teamId}/matches`,
+      filters
+    );
   }
 
   /**
    * Get head to head matches
    */
-  async getHeadToHead(matchId: number): Promise<any> {
-    return this.get(`/matches/${matchId}/head2head`);
+  async getHeadToHead(
+    matchId: number,
+    filters?: ApiHeadToHeadFilters
+  ): Promise<ApiHeadToHeadResponse> {
+    return this.get<ApiHeadToHeadResponse>(
+      `/matches/${matchId}/head2head`,
+      filters
+    );
   }
 }

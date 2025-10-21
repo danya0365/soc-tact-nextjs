@@ -4,18 +4,18 @@
  * Following Dependency Inversion Principle (SOLID)
  */
 
-import { FootballRepository } from "@/src/domain/repositories/football.repository";
 import {
+  HeadToHead,
   League,
+  Lineup,
   Match,
+  MatchEvent,
+  MatchStatistics,
   Standing,
   Team,
-  MatchStatistics,
-  MatchEvent,
-  Lineup,
   TopScorer,
-  HeadToHead,
 } from "@/src/domain/entities/football.entity";
+import { FootballRepository } from "@/src/domain/repositories/football.repository";
 import { FootballDataDatasource } from "../datasources/football-data.datasource";
 import { FootballDataMapper } from "../mappers/football-data.mapper";
 
@@ -72,14 +72,14 @@ export class FootballDataRepository implements FootballRepository {
     try {
       const today = new Date().toISOString().split("T")[0];
       const response = await this.datasource.getMatchesByDate(today);
-      
+
       const matches = response.matches.map((match: any) =>
         FootballDataMapper.mapMatch(match)
       );
 
       // Filter only live matches
-      return matches.filter((match: Match) => 
-        match.status === "live" || match.status === "in_play"
+      return matches.filter(
+        (match: Match) => match.status === "live" || match.status === "in_play"
       );
     } catch (error) {
       console.error("Error fetching live matches:", error);
@@ -127,8 +127,11 @@ export class FootballDataRepository implements FootballRepository {
    */
   async getMatchById(matchId: number): Promise<Match> {
     try {
-      const response = await this.datasource.getMatchById(matchId);
-      return FootballDataMapper.mapMatch(response.match);
+      const match = await this.datasource.getMatchById(matchId);
+      if (!match) {
+        throw new Error("Match payload is missing");
+      }
+      return FootballDataMapper.mapMatch(match);
     } catch (error) {
       console.error(`Error fetching match ${matchId}:`, error);
       throw new Error(`Failed to fetch match ${matchId}`);
@@ -142,16 +145,19 @@ export class FootballDataRepository implements FootballRepository {
     try {
       const today = new Date();
       const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-      
+
       const dateFrom = today.toISOString().split("T")[0];
       const dateTo = nextWeek.toISOString().split("T")[0];
 
       if (leagueId) {
-        const response = await this.datasource.getMatchesByCompetition(leagueId, {
-          dateFrom,
-          dateTo,
-          status: "SCHEDULED",
-        });
+        const response = await this.datasource.getMatchesByCompetition(
+          leagueId,
+          {
+            dateFrom,
+            dateTo,
+            status: "SCHEDULED",
+          }
+        );
         return response.matches.map((match: any) =>
           FootballDataMapper.mapMatch(match)
         );
@@ -177,16 +183,19 @@ export class FootballDataRepository implements FootballRepository {
     try {
       const today = new Date();
       const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
+
       const dateFrom = lastWeek.toISOString().split("T")[0];
       const dateTo = today.toISOString().split("T")[0];
 
       if (leagueId) {
-        const response = await this.datasource.getMatchesByCompetition(leagueId, {
-          dateFrom,
-          dateTo,
-          status: "FINISHED",
-        });
+        const response = await this.datasource.getMatchesByCompetition(
+          leagueId,
+          {
+            dateFrom,
+            dateTo,
+            status: "FINISHED",
+          }
+        );
         return response.matches.map((match: any) =>
           FootballDataMapper.mapMatch(match)
         );
@@ -217,7 +226,7 @@ export class FootballDataRepository implements FootballRepository {
         leagueId,
         season
       );
-      
+
       // Football-Data.org returns standings in groups (e.g., HOME, AWAY, TOTAL)
       // We want the TOTAL standings
       const totalStandings = response.standings.find(
@@ -346,7 +355,10 @@ export class FootballDataRepository implements FootballRepository {
         appearances: scorer.playedMatches || 0,
       }));
     } catch (error) {
-      console.error(`Error fetching top scorers for league ${leagueId}:`, error);
+      console.error(
+        `Error fetching top scorers for league ${leagueId}:`,
+        error
+      );
       throw new Error(`Failed to fetch top scorers for league ${leagueId}`);
     }
   }

@@ -31,11 +31,15 @@ export interface Match {
   timestamp: number;
   status: MatchStatus;
   minute?: number;
+  stage?: string | null;
+  matchday?: number | null;
   homeTeam: Team;
   awayTeam: Team;
   score: Score;
   league: League;
   venue?: string;
+  referee?: Referee;
+  winner?: MatchWinner;
 }
 
 // Match Status
@@ -62,7 +66,18 @@ export interface Score {
     home: number | null;
     away: number | null;
   };
+  winner?: MatchWinner;
+  duration?: MatchDuration;
 }
+
+export type MatchWinner = "HOME_TEAM" | "AWAY_TEAM" | "DRAW" | null;
+
+export type MatchDuration =
+  | "REGULAR"
+  | "EXTRA_TIME"
+  | "PENALTY_SHOOTOUT"
+  | "UNKNOWN"
+  | null;
 
 // Standing Entity
 export interface Standing {
@@ -163,6 +178,13 @@ export interface TopScorer {
   goals: number;
   assists?: number;
   appearances: number;
+}
+
+export interface Referee {
+  id: number;
+  name: string;
+  type: string;
+  nationality: string;
 }
 
 // Head to Head Entity
