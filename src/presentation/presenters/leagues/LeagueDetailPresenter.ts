@@ -15,6 +15,8 @@ import {
   getMatchesByLeague,
 } from "@/src/infrastructure/api/football.api";
 
+export type LeagueOverviewResult = Awaited<ReturnType<typeof getLeagueOverview>>;
+
 // View Model interfaces
 export interface LeagueDetailViewModel {
   league: LeagueSummary | null;
@@ -96,25 +98,7 @@ export class LeagueDetailPresenter {
         getMatchesByLeague(leagueIdNumber),
       ]);
 
-      const leagueSummary = mapLeagueSummary(
-        overview.league,
-        overview.standings,
-        matches
-      );
-      const standingsSummary = mapStandingsSummary(overview.standings, filter);
-      const topScorerSummary = mapTopScorersSummary(overview.topScorers);
-      const fixtureSummary = mapUpcomingFixturesSummary(
-        matches,
-        overview.league
-      );
-
-      return {
-        league: leagueSummary,
-        standings: standingsSummary,
-        topScorers: topScorerSummary,
-        upcomingFixtures: fixtureSummary,
-        filter,
-      };
+      return buildLeagueDetailViewModel(overview, matches, filter);
     } catch (error) {
       console.error("Error in LeagueDetailPresenter.getViewModel:", error);
       throw error;
@@ -172,6 +156,29 @@ const MATCH_TIME_FORMATTER = new Intl.DateTimeFormat("th-TH", {
   hour12: false,
 });
 
+export function buildLeagueDetailViewModel(
+  overview: LeagueOverviewResult,
+  matches: Match[],
+  filter: "overall" | "home" | "away"
+): LeagueDetailViewModel {
+  const leagueSummary = mapLeagueSummary(
+    overview.league,
+    overview.standings,
+    matches
+  );
+  const standingsSummary = mapStandingsSummary(overview.standings);
+  const topScorerSummary = mapTopScorersSummary(overview.topScorers);
+  const fixtureSummary = mapUpcomingFixturesSummary(matches, overview.league);
+
+  return {
+    league: leagueSummary,
+    standings: standingsSummary,
+    topScorers: topScorerSummary,
+    upcomingFixtures: fixtureSummary,
+    filter,
+  };
+}
+
 function mapLeagueSummary(
   league: League,
   standings: Standing[],
@@ -214,16 +221,10 @@ function mapLeagueSummary(
   };
 }
 
-function mapStandingsSummary(
-  standings: Standing[],
-  filter: "overall" | "home" | "away"
-): StandingSummary[] {
+function mapStandingsSummary(standings: Standing[]): StandingSummary[] {
   if (!Array.isArray(standings)) {
     return [];
   }
-
-  const useHomeStats = filter === "home";
-  const useAwayStats = filter === "away";
 
   return standings.map((standing) => ({
     position: standing.position,

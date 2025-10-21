@@ -2,10 +2,10 @@
  * Custom hook for League Detail presenter
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFootballDataPresenter } from "../../hooks/useFootballDataPresenter";
 import {
-  LeagueDetailPresenter,
-  LeagueDetailPresenterFactory,
+  buildLeagueDetailViewModel,
   type LeagueDetailViewModel,
 } from "./LeagueDetailPresenter";
 
@@ -31,9 +31,6 @@ export function useLeagueDetailPresenter(
   leagueId: string,
   initialViewModel: LeagueDetailViewModel | null = null
 ): [LeagueDetailPresenterState, LeagueDetailPresenterActions] {
-  const [presenter] = useState<LeagueDetailPresenter>(() =>
-    LeagueDetailPresenterFactory.createClient()
-  );
   const [viewModel, setViewModel] = useState<LeagueDetailViewModel | null>(
     initialViewModel
   );
@@ -41,6 +38,13 @@ export function useLeagueDetailPresenter(
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilterState] = useState<"overall" | "home" | "away">(
     initialViewModel?.filter || "overall"
+  );
+
+  const { fetchLeagueOverview, fetchMatchesByLeague } =
+    useFootballDataPresenter();
+  const leagueIdNumber = useMemo(
+    () => Number.parseInt(leagueId, 10),
+    [leagueId]
   );
 
   /**
@@ -51,17 +55,27 @@ export function useLeagueDetailPresenter(
     setError(null);
 
     try {
-      const newViewModel = await presenter.getViewModel(leagueId, filter);
+      if (Number.isNaN(leagueIdNumber)) {
+        throw new Error("รหัสลีกไม่ถูกต้อง");
+      }
+
+      const [overview, matches] = await Promise.all([
+        fetchLeagueOverview(leagueIdNumber),
+        fetchMatchesByLeague(leagueIdNumber),
+      ]);
+
+      const newViewModel = buildLeagueDetailViewModel(
+        overview,
+        matches,
+        filter
+      );
       setViewModel(newViewModel);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการโหลดข้อมูล";
-      setError(errorMessage);
       console.error("Error loading league detail:", err);
     } finally {
       setLoading(false);
     }
-  }, [presenter, leagueId, filter]);
+  }, [fetchLeagueOverview, fetchMatchesByLeague, filter, leagueIdNumber]);
 
   /**
    * Refresh data
@@ -81,8 +95,8 @@ export function useLeagueDetailPresenter(
    * Load data when filter changes
    */
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    //loadData();
+  }, []);
 
   // State object
   const state: LeagueDetailPresenterState = {
