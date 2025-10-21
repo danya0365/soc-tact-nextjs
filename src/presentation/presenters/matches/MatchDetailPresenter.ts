@@ -12,6 +12,23 @@ export interface MatchDetailViewModel {
   match: MatchDetail | null;
 }
 
+function mapWinnerSummary(
+  winner: Match["winner"] | null,
+  match: Match
+): WinnerSummary | undefined {
+  if (!winner) return undefined;
+
+  if (winner === "DRAW") {
+    return { type: "DRAW", label: "เสมอ" };
+  }
+
+  const winningTeam = winner === "HOME_TEAM" ? match.homeTeam : match.awayTeam;
+  return {
+    type: winner,
+    label: winningTeam.name,
+  };
+}
+
 export interface MatchDetail {
   id: string;
   homeTeam: TeamSummary;
@@ -21,9 +38,12 @@ export interface MatchDetail {
   minute: number | null;
   league: LeagueSummary;
   venue: VenueSummary;
+  matchday?: number | null;
+  stage?: string | null;
+  winner?: WinnerSummary;
   date: string;
   time: string;
-  referee?: string;
+  referee?: RefereeSummary;
   statistics?: MatchStatisticsSummary;
   events?: MatchEventSummary[];
   lineups?: MatchLineupsSummary;
@@ -46,6 +66,10 @@ interface ScoreSummary {
     home: number | null;
     away: number | null;
   };
+  fulltime?: {
+    home: number | null;
+    away: number | null;
+  };
 }
 
 interface LeagueSummary {
@@ -58,6 +82,43 @@ interface LeagueSummary {
 interface VenueSummary {
   name: string;
   city: string;
+}
+
+interface RefereeSummary {
+  name: string;
+  nationality?: string;
+  type?: string;
+}
+
+interface WinnerSummary {
+  type: "HOME_TEAM" | "AWAY_TEAM" | "DRAW";
+  label: string;
+}
+
+function mapStageLabel(stage?: string | null): string | null {
+  if (!stage) return null;
+
+  const stageMap: Record<string, string> = {
+    REGULAR_SEASON: "ฤดูกาลปกติ",
+    GROUP_STAGE: "รอบแบ่งกลุ่ม",
+    QUALIFICATION: "รอบคัดเลือก",
+    PLAY_OFF: "เพลย์ออฟ",
+    LAST_16: "รอบ 16 ทีม",
+    QUARTER_FINAL: "รอบก่อนรองฯ",
+    SEMI_FINAL: "รอบรองฯ",
+    FINAL: "รอบชิงชนะเลิศ",
+  };
+
+  if (stageMap[stage]) {
+    return stageMap[stage];
+  }
+
+  const formatted = stage
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  return formatted;
 }
 
 type MatchStatisticsSummary = Record<
@@ -187,6 +248,8 @@ function mapHeadToHeadSummary(
 }
 
 function mapDomainMatchToDetail(match: Match): MatchDetail {
+  const resolvedWinner = match.winner ?? match.score.winner ?? null;
+
   return {
     id: match.id.toString(),
     homeTeam: mapTeam(match.homeTeam),
@@ -200,6 +263,12 @@ function mapDomainMatchToDetail(match: Match): MatchDetail {
             away: match.score.halftime.away ?? null,
           }
         : undefined,
+      fulltime: match.score.fulltime
+        ? {
+            home: match.score.fulltime.home ?? null,
+            away: match.score.fulltime.away ?? null,
+          }
+        : undefined,
     },
     status: mapMatchStatus(match.status),
     minute: match.minute ?? null,
@@ -208,9 +277,18 @@ function mapDomainMatchToDetail(match: Match): MatchDetail {
       name: match.venue?.trim() || DEFAULT_VENUE_NAME,
       city: match.league.country,
     },
+    matchday: match.matchday ?? null,
+    stage: mapStageLabel(match.stage),
+    winner: mapWinnerSummary(resolvedWinner, match),
     date: match.date,
     time: formatMatchTime(match.date),
-    referee: undefined,
+    referee: match.referee
+      ? {
+          name: match.referee.name,
+          nationality: match.referee.nationality,
+          type: match.referee.type,
+        }
+      : undefined,
     statistics: undefined,
     events: undefined,
     lineups: undefined,

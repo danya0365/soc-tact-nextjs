@@ -2,6 +2,7 @@
 
 import type { MatchDetailViewModel } from "@/src/presentation/presenters/matches/MatchDetailPresenter";
 import { useMatchDetailPresenter } from "@/src/presentation/presenters/matches/useMatchDetailPresenter";
+import Image from "next/image";
 import Link from "next/link";
 
 interface MatchDetailViewProps {
@@ -13,8 +14,30 @@ export function MatchDetailView({
   matchId,
   initialViewModel,
 }: MatchDetailViewProps) {
-  const [state, actions] = useMatchDetailPresenter(matchId, initialViewModel);
+  const [state] = useMatchDetailPresenter(matchId, initialViewModel);
   const match = state.viewModel?.match;
+
+  const renderBadgeImage = (src: string, alt: string, fallback: string) => {
+    if (!src || src === "⚽") {
+      return (
+        <div className="h-16 w-16 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-3xl">
+          {fallback}
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-gray-200 dark:border-gray-700">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="64px"
+          className="object-cover"
+        />
+      </div>
+    );
+  };
 
   // Helper functions
   const getStatusColor = (status: string) => {
@@ -118,59 +141,97 @@ export function MatchDetailView({
         </Link>
 
         {/* Match Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">{match.league.logo}</span>
-              <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {match.league.name}
-              </span>
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg px-6 py-8 mb-6 border border-gray-100 dark:border-gray-700/40">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
+            <div className="flex items-center space-x-4">
+              {renderBadgeImage(
+                match.league.logo,
+                match.league.name,
+                match.league.name.slice(0, 1)
+              )}
+              <div>
+                <p className="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  {match.league.country}
+                </p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                  {match.league.name}
+                </p>
+                {(match.matchday || match.stage) && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {match.matchday ? `Matchday ${match.matchday}` : ""}
+                    {match.matchday && match.stage ? " • " : ""}
+                    {match.stage ?? ""}
+                  </p>
+                )}
+              </div>
             </div>
-            <span
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
-                match.status
-              )}`}
-            >
-              {match.status === "live" && match.minute
-                ? `${match.minute}'`
-                : getStatusText(match.status)}
-            </span>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <span
+                className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
+                  match.status
+                )}`}
+              >
+                {match.status === "live" && match.minute
+                  ? `${match.minute}'`
+                  : getStatusText(match.status)}
+              </span>
+              {match.winner?.label && (
+                <span className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200 text-sm font-semibold">
+                  Winner: {match.winner.label}
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             {/* Home Team */}
-            <div className="text-center">
-              <div className="text-6xl mb-4">{match.homeTeam.logo}</div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+            <div className="flex flex-col items-center text-center space-y-2">
+              {renderBadgeImage(
+                match.homeTeam.logo,
+                match.homeTeam.name,
+                match.homeTeam.name.slice(0, 1)
+              )}
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {match.homeTeam.name}
               </h2>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {match.homeTeam.shortName}
               </p>
             </div>
 
             {/* Score */}
             <div className="text-center">
+              <div className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+                {new Date(match.date).toLocaleDateString("th-TH", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
               {match.status === "upcoming" ? (
-                <div className="text-gray-500 dark:text-gray-400">
-                  <div className="text-lg mb-2">
-                    {new Date(match.date).toLocaleDateString("th-TH", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    เวลาแข่งขัน
                   </div>
-                  <div className="text-3xl font-bold">{match.time}</div>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+                    {match.time}
+                  </div>
                 </div>
               ) : (
                 <>
-                  <div className="text-6xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  <div className="text-6xl font-extrabold text-gray-900 dark:text-gray-100">
                     {match.score.home} - {match.score.away}
                   </div>
                   {match.score.halftime && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      (HT: {match.score.halftime.home} -{" "}
-                      {match.score.halftime.away})
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      ครึ่งแรก: {match.score.halftime.home} - {match.score.halftime.away}
+                    </div>
+                  )}
+                  {match.score.fulltime && (
+                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      เต็มเวลา: {match.score.fulltime.home} - {match.score.fulltime.away}
                     </div>
                   )}
                 </>
@@ -178,24 +239,61 @@ export function MatchDetailView({
             </div>
 
             {/* Away Team */}
-            <div className="text-center">
-              <div className="text-6xl mb-4">{match.awayTeam.logo}</div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+            <div className="flex flex-col items-center text-center space-y-2">
+              {renderBadgeImage(
+                match.awayTeam.logo,
+                match.awayTeam.name,
+                match.awayTeam.name.slice(0, 1)
+              )}
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {match.awayTeam.name}
               </h2>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {match.awayTeam.shortName}
               </p>
             </div>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
-            <div className="flex items-center justify-center space-x-6">
-              <span>
-                📍 {match.venue.name}, {match.venue.city}
-              </span>
-              {match.referee && <span>👨‍⚖️ {match.referee}</span>}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/40 rounded-xl px-4 py-3">
+              <span className="text-lg">📍</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  {match.venue.name}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {match.venue.city}
+                </p>
+              </div>
             </div>
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/40 rounded-xl px-4 py-3">
+              <span className="text-lg">⏱️</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  อัปเดตล่าสุด
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {match.minute ? `${match.minute} นาที` : getStatusText(match.status)}
+                </p>
+              </div>
+            </div>
+            {match.referee && (
+              <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/40 rounded-xl px-4 py-3">
+                <span className="text-lg">👨‍⚖️</span>
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    {typeof match.referee === "string"
+                      ? match.referee
+                      : match.referee.name}
+                  </p>
+                  {typeof match.referee !== "string" && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {match.referee.nationality || match.referee.type || ""}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
